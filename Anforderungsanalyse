@@ -1,0 +1,37 @@
+Tools, Frameworks:
+    Tensorflow Backend und Frontend
+    - Keras
+        einfache API aufbauend auf Tensorflow -> geeignet fuer kurzes Projekt ohne viel Einarbeitung
+        Modularer Aufbau -> Aufbauen eines Netzes nach Baukastenprinzip -> niedrige Komplexitaet
+        funktioniert mit Python -> rapid prototyping
+        OpenSource -> keine Kosten, weit verbreitet und gut getestet
+
+    - TensorBoard
+        funktioniert einfach mit Tensorflow
+
+    Git
+    Python3
+
+nicht funktionale Anforderungen
+    - Latenz unter
+
+
+funktionale Anforderungen
+    - Einlesen von Daten
+    - Trainieren des Modells
+    - Visualisieren des Ergebnisses
+    - Grafikkartenunterstuetzung
+
+fachliches Datenmodell
+
+Anwendungsfaelle
+
+Risiken
+
+Systemintegration
+
+Projektmanagement
+    2 Wochen, 4 Leute
+    Personentage: 40
+    Kosten: 0
+
