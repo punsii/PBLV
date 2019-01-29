@@ -53,22 +53,8 @@ print("Sensors: ", sensor_count)
 
 model = build_model(dimension_count, sensor_count)
 
-tbCallBack = tf.keras.callbacks.TensorBoard(log_dir='../log',
-                                            histogram_freq=1,
-                                            write_graph=True,
-                                            write_grads=True,
-                                            write_images=True,
-                                            batch_size=32)
-
-# XXX Workaround for histogramm in TensorBoard
-validation_samples, validation_sensors = test_data_reader.read_test_data(file_name="../test_data.txt")
-validation_targets, validation_distances = split_data(validation_samples)
-##############################################
-
 # Train model
-model.fit(distances, targets, epochs=10,
-          validation_data=(validation_distances, validation_targets),
-          callbacks=[tbCallBack])
+model.fit(distances, targets, epochs=10)
 
 # Test model
 test_samples, test_sensors = test_data_reader.read_test_data(file_name="../test_data.txt")
