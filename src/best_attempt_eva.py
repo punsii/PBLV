@@ -6,17 +6,17 @@ from tensorflow import keras
 
 
 # Build TensorFlow model
-def build_model(dimension_count):
+def build_model(dimension_count, sensor_count):
     model = keras.Sequential([
-        keras.layers.Dense(64, activation=tf.nn.relu),
-        keras.layers.Dense(64, activation=tf.nn.relu),
+        keras.layers.Dense(sensor_count, activation=tf.nn.relu, input_shape=(sensor_count, )),
+        keras.layers.Dense(sensor_count, activation=tf.nn.relu),
         keras.layers.Dense(dimension_count)
     ])
 
     model.compile(
-        optimizer='adam',
-        loss='sparse_categorical_crossentropy',
-        metrics=['accuracy']
+        optimizer=keras.optimizers.RMSprop(0.001),
+        loss="mse",
+        metrics=["mae", "mse"]
     )
 
     return model
@@ -28,8 +28,8 @@ def split_data(data):
     distances = []
 
     for data_set in data:
-        targets = data_set[0]
-        distances = data_set[1]
+        targets.append(data_set[0])
+        distances.append(data_set[1])
 
     return [targets, distances]
 
@@ -47,13 +47,7 @@ distances = np.array(splitted_data[1], dtype=float)
 print("Dimensions:", dimensionCount)
 print("Sensors: ", sensorCount)
 
-print("Targets:", targets)
-print("Distances:", distances)
-
-print("Targets Shape:", targets.shape)
-print("Distances Shape:", distances.shape)
-
-model = build_model(dimensionCount)
+model = build_model(dimensionCount, sensorCount)
 
 # Train model
 model.fit(distances, targets, epochs=10)
