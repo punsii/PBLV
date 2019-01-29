@@ -1,30 +1,45 @@
 import random
 
 
-def random_pos(dimension, min_range, max_range):
+def generate_target(dimension, min_range, max_range):
     pos = []
     for i in range(dimension):
         pos.append(random.randrange(min_range, max_range))
     return pos
 
 
-def generate(dimension, sensors, output_len, min_range, max_range):
-    outputs = []
-    for i in range(output_len):
-        target = random_pos(dimension, min_range, max_range)
-        distances = []
-        for j in range(len(sensors)):
-            sensor = sensors[j]
-            if len(sensor) is not dimension:
-                raise Exception('sensors position not matching dimension')
-            tmp = 0.0
-            for k in range(dimension):
-                tmp = tmp + (sensor[k] - target[k])**2
-            tmp = tmp**0.5
-            distances.append(tmp)
-        outputs.append([target, distances])
-    return outputs
+def generate_targets(number_of_targets, dimension, min_range, max_range):
+    targets = []
+    for i in range(number_of_targets):
+        targets.append(generate_target(dimension, min_range, max_range))
+    return targets
 
 
-for data in generate(2, [[0, 0], [0, 5], [5, 0]], 50, -10, 10):
-    print("target: " + str(data[0]) + ", distances: " + str(data[1]))
+def distance(a, b):
+    if len(a) is not len(b):
+        raise Exception('Dimensions not matching')
+    tmp = 0.0
+    for i in range(len(a)):
+        tmp = tmp + (a[i] - b[i])**2
+    tmp = tmp**0.5
+    return tmp
+
+
+def calculate_distances(target, sensors):
+    distances = []
+    for sensor in sensors:
+        distances.append(distance(target, sensor))
+    return distances
+
+
+number_of_targets = 50000
+dimension = 3
+min_range = -5
+max_range = 5
+sensors = [[0, 0, 0], [5, 0, 0], [0, 5, 0], [0, 0, 5]]
+targets = generate_targets(number_of_targets, dimension, min_range, max_range)
+
+
+for target in targets:
+    distances = calculate_distances(target, sensors)
+    print(f"target: {target}, distances: {distances}")
