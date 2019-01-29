@@ -1,5 +1,4 @@
-import generator as gen
-import random
+from src import generator as gen
 
 
 # Script will generate random test data and write it to a file.
@@ -20,5 +19,5 @@ writeTestDataToFile(
     dimensions=2,
     sensor_count=3,
     count=100000,
-    out_file_name="test_data.txt"
+    out_file_name="../test_data.txt"
 )

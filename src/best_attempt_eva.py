@@ -1,4 +1,4 @@
-import test_data_reader
+from src import test_data_reader
 
 import numpy as np
 import tensorflow as tf
@@ -35,7 +35,7 @@ def split_data(data):
 
 
 # Read data
-data = test_data_reader.readTestData(file_name="test_data.txt")
+data = test_data_reader.readTestData(file_name="../test_data.txt")
 
 dimensionCount = len(data[0][0])
 sensorCount = len(data[0][1])
