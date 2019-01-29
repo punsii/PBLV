@@ -9,7 +9,7 @@ from tensorflow import keras
 def build_model(dimension_count, sensor_count):
     model = keras.Sequential([
         keras.layers.Dense(20 * sensor_count, activation=tf.nn.relu, input_shape=(sensor_count,)),
-        keras.layers.Dense(20 * sensor_count, activation=tf.nn.relu),
+        keras.layers.Dense(20 * sensor_count, activation=tf.nn.softmax),
         keras.layers.Dense(dimension_count)
     ])
 
