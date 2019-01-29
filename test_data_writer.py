@@ -6,29 +6,19 @@ import random
 def writeTestDataToFile(dimensions, sensor_count, count, out_file_name):
     file = open(out_file_name, "w+")  # Create file
 
-    sensorPositions = generateSensorPositions(sensor_count)
+    sensors = gen.generate_targets(sensor_count, dimensions, 0.0, 1.0)
+    targets = gen.generate_targets(count, dimensions, 0.0, 1.0)
 
-    for data in gen.generate(dimensions, sensorPositions, count, 0.0, 1.0):
-        file.write(str(data[0]) + "," + str(data[1]) + "\n")
+    for target in targets:
+        distances = gen.calculate_distances(target, sensors)
+        file.write(str(target) + ", " + str(distances) + "\n")
 
     file.close()
-
-
-def generateSensorPositions(count):
-    result = []
-
-    for i in range(count):
-        result.append([
-            random.uniform(0.0, 1.0),
-            random.uniform(0.0, 1.0)
-        ])
-
-    return result
 
 
 writeTestDataToFile(
     dimensions=2,
     sensor_count=3,
-    count=10000,
+    count=100000,
     out_file_name="test_data.txt"
 )
