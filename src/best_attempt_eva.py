@@ -61,8 +61,21 @@ tbCallBack = tf.keras.callbacks.TensorBoard(log_dir='../log',
                                             write_grads=True,
                                             write_images=True,
                                             batch_size=32)
+
+# XXX Workaround for histogramm in TensorBoard
+validation_data = test_data_reader.read_test_data(file_name="../validation_data.txt")
+validation_samples = validation_data[0]
+validation_sensors = validation_data[1]
+
+splitted_data = split_data(validation_samples)
+validation_targets = np.array(splitted_data[0], dtype=float)
+validation_distances = np.array(splitted_data[1], dtype=float)
+##############################################
+
 # Train model
-model.fit(distances, targets, epochs=10, callbacks=[tbCallBack])
+model.fit(distances, targets, epochs=10,
+          validation_data=(validation_distances, validation_targets),
+          callbacks=[tbCallBack])
 
 # Test model
 test_data = test_data_reader.read_test_data(file_name="../test_data.txt")
