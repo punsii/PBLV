@@ -11,7 +11,7 @@ def read_test_data(file_name):
                 samples.append(_parse_line(line))
             index = index + 1
 
-    return [samples, sensors]
+    return samples, sensors
 
 
 def _parse_first_line(line):
