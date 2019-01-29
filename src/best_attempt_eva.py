@@ -63,7 +63,7 @@ tbCallBack = tf.keras.callbacks.TensorBoard(log_dir='../log',
                                             batch_size=32)
 
 # XXX Workaround for histogramm in TensorBoard
-validation_data = test_data_reader.read_test_data(file_name="../validation_data.txt")
+validation_data = test_data_reader.read_test_data(file_name="../test_data.txt")
 validation_samples = validation_data[0]
 validation_sensors = validation_data[1]
 
