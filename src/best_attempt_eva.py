@@ -55,8 +55,14 @@ print("Sensors: ", sensor_count)
 
 model = build_model(dimension_count, sensor_count)
 
+tbCallBack = tf.keras.callbacks.TensorBoard(log_dir='../log',
+                                            histogram_freq=1,
+                                            write_graph=True,
+                                            write_grads=True,
+                                            write_images=True,
+                                            batch_size=32)
 # Train model
-model.fit(distances, targets, epochs=10)
+model.fit(distances, targets, epochs=10, callbacks=[tbCallBack])
 
 # Test model
 test_data = test_data_reader.read_test_data(file_name="../test_data.txt")
