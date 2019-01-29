@@ -18,6 +18,6 @@ def writeTestDataToFile(dimensions, sensor_count, count, out_file_name):
 writeTestDataToFile(
     dimensions=2,
     sensor_count=3,
-    count=100000,
+    count=10000,
     out_file_name="../test_data.txt"
 )

@@ -8,13 +8,13 @@ from tensorflow import keras
 # Build TensorFlow model
 def build_model(dimension_count, sensor_count):
     model = keras.Sequential([
-        keras.layers.Dense(sensor_count, activation=tf.nn.relu, input_shape=(sensor_count, )),
-        keras.layers.Dense(sensor_count, activation=tf.nn.relu),
+        keras.layers.Dense(20 * sensor_count, activation=tf.nn.relu, input_shape=(sensor_count,)),
+        keras.layers.Dense(20 * sensor_count, activation=tf.nn.relu),
         keras.layers.Dense(dimension_count)
     ])
 
     model.compile(
-        optimizer=keras.optimizers.RMSprop(0.001),
+        optimizer=keras.optimizers.RMSprop(lr=0.001),
         loss="mse",
         metrics=["mae", "mse"]
     )
@@ -35,7 +35,7 @@ def split_data(data):
 
 
 # Read data
-data = test_data_reader.readTestData(file_name="../test_data.txt")
+data = test_data_reader.readTestData(file_name="../training_data.txt")
 
 dimensionCount = len(data[0][0])
 sensorCount = len(data[0][1])
@@ -51,3 +51,10 @@ model = build_model(dimensionCount, sensorCount)
 
 # Train model
 model.fit(distances, targets, epochs=10)
+
+# Test model
+testData = test_data_reader.readTestData(file_name="../test_data.txt")
+
+splitted_data = split_data(data)
+testTargets = np.array(splitted_data[0], dtype=float)
+testDistances = np.array(splitted_data[1], dtype=float)
