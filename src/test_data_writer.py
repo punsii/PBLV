@@ -8,6 +8,11 @@ def writeTestDataToFile(dimensions, sensor_count, count, out_file_name):
     sensors = gen.generate_targets(sensor_count, dimensions, 0.0, 1.0)
     targets = gen.generate_targets(count, dimensions, 0.0, 1.0)
 
+    # Write sensor positions in the first line.
+    for sensor in sensors:
+        file.write(str(sensor) + ", ")
+    file.write("\n")
+
     for target in targets:
         distances = gen.calculate_distances(target, sensors)
         file.write(str(target) + ", " + str(distances) + "\n")
@@ -18,6 +23,6 @@ def writeTestDataToFile(dimensions, sensor_count, count, out_file_name):
 writeTestDataToFile(
     dimensions=2,
     sensor_count=3,
-    count=10000,
+    count=100000,
     out_file_name="../test_data.txt"
 )

@@ -1,11 +1,31 @@
 # Read test data from the passed file name.
 def read_test_data(file_name):
     samples = []
+    sensors = []
     with open(file_name) as file:
+        index = 0
         for line in file:
-            samples.append(_parse_line(line))
+            if index == 0:
+                sensors = _parse_first_line(line)
+            else:
+                samples.append(_parse_line(line))
+            index = index + 1
 
-    return samples
+    return [samples, sensors]
+
+
+def _parse_first_line(line):
+    result = []
+
+    line = line.strip()
+    parts = line.split("],")
+
+    for part in parts:
+        part = part.translate({ord(i): None for i in '[]'})
+        if len(part) != 0:
+            result.append(_parse_number_array(part))
+
+    return result
 
 
 def _parse_line(line):
@@ -29,7 +49,7 @@ def _parse_number_array(string):
 
     result = []
     for part in parts:
-        number = float(part)
+        number = float(part.strip())
         result.append(number)
 
     return result
