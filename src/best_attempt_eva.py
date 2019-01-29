@@ -35,7 +35,7 @@ def split_data(data):
 
 
 # Read data
-data = test_data_reader.readTestData(file_name="../training_data.txt")
+data = test_data_reader.read_test_data(file_name="../training_data.txt")
 
 dimensionCount = len(data[0][0])
 sensorCount = len(data[0][1])
@@ -53,8 +53,11 @@ model = build_model(dimensionCount, sensorCount)
 model.fit(distances, targets, epochs=10)
 
 # Test model
-testData = test_data_reader.readTestData(file_name="../test_data.txt")
+test_data = test_data_reader.read_test_data(file_name="../test_data.txt")
 
 splitted_data = split_data(data)
-testTargets = np.array(splitted_data[0], dtype=float)
-testDistances = np.array(splitted_data[1], dtype=float)
+test_targets = np.array(splitted_data[0], dtype=float)
+test_distances = np.array(splitted_data[1], dtype=float)
+
+test_loss, test_mae, test_mse = model.evaluate(test_distances, test_targets)
+print("Test MAE:", test_mae, ", Test MSE:", test_mse)

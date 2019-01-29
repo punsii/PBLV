@@ -1,5 +1,5 @@
 # Read test data from the passed file name.
-def readTestData(file_name):
+def read_test_data(file_name):
     samples = []
     with open(file_name) as file:
         for line in file:
