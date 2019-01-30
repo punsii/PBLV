@@ -35,6 +35,38 @@ def split_data(data):
     return np.array(targets, dtype=float), np.array(distances, dtype=float)
 
 
+def predict_shit(model, test_distances, test_sensors, test_targets):
+    predictions = model.predict(test_distances)
+
+    xAxis = []
+    yAxis = []
+    for sensor_pos in test_sensors:
+        xAxis.append(sensor_pos[0])
+        yAxis.append(sensor_pos[1])
+
+    xAxisTargets = []
+    yAxisTargets = []
+    for i in range(1):
+        target = test_targets[i]
+        xAxisTargets.append(target[0])
+        yAxisTargets.append(target[1])
+
+    xAxisPredictions = []
+    yAxisPredictions = []
+    for i in range(1):
+        prediction = predictions[i]
+        xAxisPredictions.append(prediction[0])
+        yAxisPredictions.append(prediction[1])
+
+    plt.plot(
+        xAxis, yAxis, "ro",
+        xAxisTargets, yAxisTargets, "bs",
+        xAxisPredictions, yAxisPredictions, "g^"
+    )
+    plt.axis([-1.0, 1.0, -1.0, 1.0])
+    plt.show()
+
+
 # Read data
 data = test_data_reader.read_test_data(file_name="../training_data.txt")
 
@@ -64,15 +96,4 @@ test_loss, test_mae, test_mse = model.evaluate(test_distances, test_targets)
 print("Test MAE:", test_mae, ", Test MSE:", test_mse)
 
 # Plot prediction
-predictions = model.predict(test_distances)
-print(predictions[0])
-
-xAxis = []
-yAxis = []
-for sensor_pos in test_sensors:
-    xAxis.append(sensor_pos[0])
-    yAxis.append(sensor_pos[1])
-
-plt.plot(xAxis, yAxis, "ro", [test_targets[0][0]], [test_targets[0][1]], "bs", [predictions[0][0]], [predictions[0][1]], "g^")
-plt.axis([0.0, 1.0, 0.0, 1.0])
-plt.show()
+predict_shit(model, test_distances, test_sensors, test_targets)
