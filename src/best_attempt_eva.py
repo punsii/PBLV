@@ -66,24 +66,37 @@ def predict_shit(model, test_distances, test_sensors, test_targets):
         xAxisTargets, yAxisTargets, "bs",
         xAxisPredictions, yAxisPredictions, "g^"
     )
-    plt.axis([-1.0, 1.0, -1.0, 1.0])
+    plt.axis([0.0, 1.0, 0.0, 1.0])
     plt.show()
 
 
 def visualize_error(model, test_sensors, size):
     x = np.arange(size)
     y = np.arange(size)
-    z = np.zeros((size,size))
+    z = np.zeros((size, size), dtype=float)
+
+    distances_to_predict = np.zeros(shape=(size * size, len(test_sensors)), dtype=float)
+    targets = np.zeros(shape=(size * size, 2), dtype=float)
 
     for column in x:
         for row in y:
-            target = np.array(column, row) / size
-            distances = generator.calculate_distances(target, test_sensors)
+            target = np.array([column, row]) / size
+            targets[column * row + row] = target
+            distances_to_predict[column * row + row] = generator.calculate_distances(target, test_sensors)
 
-            _, z[column, row] = model.evaluate(distances, target)
+    predictions = model.predict(distances_to_predict)
 
-    x /= size
-    y /= size
+    for column in x:
+        for row in y:
+            index = column * row + row
+
+            prediction = predictions[index]
+            target = targets[index]
+
+            z[column, row] = np.linalg.norm(prediction - target)
+
+    x = np.linspace(0.0, 1.0, size)
+    y = np.linspace(0.0, 1.0, size)
     plt.plot()
     plt.contourf(x, y, z)
     plt.show()
@@ -120,5 +133,4 @@ print("Test MAE:", test_mae, ", Test MSE:", test_mse)
 # Plot prediction
 predict_shit(model, test_distances, test_sensors, test_targets)
 
-visualize_error(model, test_sensors, size=100)
-
+visualize_error(model, test_sensors, size=10)
