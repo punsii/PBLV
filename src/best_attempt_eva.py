@@ -3,6 +3,8 @@ from src import generator
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+import seaborn as sns
 import tensorflow as tf
 from tensorflow import keras
 
@@ -69,34 +71,11 @@ def predict_shit(model, test_distances, test_sensors, test_targets):
 
 
 def visualize_error(model, test_sensors, size):
-    errors = []
+    xaxis = np.linspace(0, 1, 10)
+    yaxis = np.linspace(0, 1, 10)
+    loss, mae, mse = model.evaluate(xaxis[:, None], yaxis[None, :])
 
-    offset = 1.0 / size
-    for column in range(size):
-        for row in range(size):
-            target_x = column * offset
-            target_y = row * offset
-            target = [target_x, target_y]
-
-            distances = np.array([generator.calculate_distances(target, test_sensors)], dtype=float)
-            targets = np.array([target], dtype=float)
-
-            loss, mae, mse = model.evaluate(distances, targets)
-            errors.append(mae)
-
-    xAxis = []
-    yAxis = []
-    errorLength = len(errors)
-    offset = 1.0 / errorLength
-    for i in range(errorLength):
-        xAxis.append(offset * i)
-        yAxis.append(errors[i])
-
-    plt.plot(
-        xAxis, yAxis,
-    )
-    plt.axis([0.0, 1.0, 0.0, 1.0])
-    plt.show()
+    h = plt.contourf(xaxis, yaxis, mae)
 
 
 # Read data
@@ -131,3 +110,4 @@ print("Test MAE:", test_mae, ", Test MSE:", test_mse)
 predict_shit(model, test_distances, test_sensors, test_targets)
 
 visualize_error(model, test_sensors, size=10)
+
