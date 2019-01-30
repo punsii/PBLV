@@ -40,7 +40,6 @@ def split_data(data):
 
 
 def visualize_shit_interactive(model, sensors):
-
     from matplotlib.widgets import Slider
 
     x_min = 0
@@ -70,7 +69,7 @@ def visualize_shit_interactive(model, sensors):
     slider_ax = plt.axes([0.1, 0.05, 0.8, 0.05])
 
     # in main_ax we plot the function with the initial value of the parameter a
-    plt.axes(main_ax)  # select main_ax
+    plt.sca(main_ax)  # select main_ax
     plt.title('prediction (x) vs real position (o)')
     first_plot = plt.plot(
         xAxisSensors, yAxisSensors, "ro",
@@ -78,21 +77,32 @@ def visualize_shit_interactive(model, sensors):
         prediction[0], prediction[1], "g^"
     )
     plt.axis([0.0, 1.0, 0.0, 1.0])
-    plt.show()
+
     plt.xlim(-0.1, 1.1)
     plt.ylim(-0.1, 1.1)
 
-    x_slider = Slider(slider_ax, 'x', x_min, x_max, valinit=x_init )
+    x_slider = Slider(slider_ax, 'x', x_min, x_max, valinit=x_init)
 
     def update(new_x):
-        test_distance = np.array([y_init, new_x])
-        prediction = model.predict(test_distance)
+        global prediction
+
+        test_distances = np.array([generator.calculate_distances(np.array([new_x, y_init]), sensors)])
+        predictions = model.predict(test_distances)
+        prediction = predictions[0]
+
+        plt.plot(
+            xAxisSensors, yAxisSensors, "ro",
+            x_init, y_init, "bs",
+            prediction[0], prediction[1], "g^"
+        )
+
         fig.canvas.draw_idle()  # redraw the plot
 
     # the final step is to specify that the slider needs to
     # execute the above function when its value changes
     x_slider.on_changed(update)
 
+    plt.show()
 
 
 def visualize_error(model, sensors, size, dimension_count):
