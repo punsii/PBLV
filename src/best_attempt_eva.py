@@ -75,13 +75,16 @@ def visualize_error(model, test_sensors, size):
     y = np.linspace(0, 1, size)
     z = np.zeros((size,size))
 
-    for cur_x in x:
-        for cur_y in y:
-            target = [x, y]
+    for column in range(size):
+        for row in range(size):
+            target = [x[column], y[row]]
             distance = np.array([generator.calculate_distances(target, test_sensors)], dtype=float)
-            loss, z[cur_x, cur_y], mse = model.evaluate(distance, target)
 
+            loss, z[column, row], mse = model.evaluate(distance, np.array([target]))
+
+    plt.plot()
     h = plt.contourf(x, y, z)
+    plt.show()
 
 
 # Read data
@@ -115,5 +118,5 @@ print("Test MAE:", test_mae, ", Test MSE:", test_mse)
 # Plot prediction
 predict_shit(model, test_distances, test_sensors, test_targets)
 
-visualize_error(model, test_sensors, size=10)
+visualize_error(model, test_sensors, size=100)
 
