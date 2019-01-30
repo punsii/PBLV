@@ -83,6 +83,8 @@ def visualize_error(model, test_sensors, size):
 
             z[column, row] = np.linalg.norm(prediction - target)
 
+    print("Max error:", z.max(), ", Min error:", z.min(), ", Average error:", z.mean())
+
     x = np.linspace(0.0, 1.0, size)
     y = np.linspace(0.0, 1.0, size)
     plt.plot()
@@ -115,4 +117,4 @@ print("Test MAE:", test_mae, ", Test MSE:", test_mse)
 # Plot prediction
 predict_shit(model, test_distances, test_sensors, test_targets)
 
-visualize_error(model, test_sensors, size=10)
+visualize_error(model, test_sensors, size=100)
