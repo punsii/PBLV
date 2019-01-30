@@ -1,4 +1,5 @@
 from src import test_data_reader
+from src import generator
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,7 +16,7 @@ def build_model(dimension_count, sensor_count):
     ])
 
     model.compile(
-        optimizer=keras.optimizers.RMSprop(lr=0.001),
+        optimizer="adam",
         loss="mse",
         metrics=["mae", "mse"]
     )
@@ -67,6 +68,37 @@ def predict_shit(model, test_distances, test_sensors, test_targets):
     plt.show()
 
 
+def visualize_error(model, test_sensors, size):
+    errors = []
+
+    offset = 1.0 / size
+    for column in range(size):
+        for row in range(size):
+            target_x = column * offset
+            target_y = row * offset
+            target = [target_x, target_y]
+
+            distances = np.array([generator.calculate_distances(target, test_sensors)], dtype=float)
+            targets = np.array([target], dtype=float)
+
+            loss, mae, mse = model.evaluate(distances, targets)
+            errors.append(mae)
+
+    xAxis = []
+    yAxis = []
+    errorLength = len(errors)
+    offset = 1.0 / errorLength
+    for i in range(errorLength):
+        xAxis.append(offset * i)
+        yAxis.append(errors[i])
+
+    plt.plot(
+        xAxis, yAxis,
+    )
+    plt.axis([0.0, 1.0, 0.0, 1.0])
+    plt.show()
+
+
 # Read data
 data = test_data_reader.read_test_data(file_name="../training_data.txt")
 
@@ -97,3 +129,5 @@ print("Test MAE:", test_mae, ", Test MSE:", test_mse)
 
 # Plot prediction
 predict_shit(model, test_distances, test_sensors, test_targets)
+
+visualize_error(model, test_sensors, size=10)
