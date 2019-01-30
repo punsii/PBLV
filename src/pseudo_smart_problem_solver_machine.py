@@ -39,7 +39,7 @@ def split_data(data):
     return np.array(targets, dtype=float), np.array(distances, dtype=float)
 
 
-def visualize_shit_interactive(model, test_sensors):
+def visualize_shit_interactive(model, sensors):
 
     from matplotlib.widgets import Slider
 
@@ -56,7 +56,7 @@ def visualize_shit_interactive(model, test_sensors):
 
     xAxisSensors = []
     yAxisSensors = []
-    for sensor_pos in test_sensors:
+    for sensor_pos in sensors:
         xAxisSensors.append(sensor_pos[0])
         yAxisSensors.append(sensor_pos[1])
 
@@ -196,6 +196,6 @@ test_loss, test_mae, test_mse = model.evaluate(testing_distances, testing_target
 print("Test MAE:", test_mae, ", Test MSE:", test_mse)
 
 # Plot prediction
-predict_shit(model, testing_distances, sensors, testing_targets)
+visualize_shit_interactive(model, sensors)
 
 visualize_error(model, sensors, size=10, dimension_count=dimension_count)
