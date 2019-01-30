@@ -1,5 +1,5 @@
-from src import test_data_reader
-from src import generator
+import test_data_reader
+import generator
 
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
@@ -39,7 +39,6 @@ def split_data(data):
     return np.array(targets, dtype=float), np.array(distances, dtype=float)
 
 def visualize_shit_interactive(model, sensors):
-
     from matplotlib.widgets import Slider
 
     x_min = 0
@@ -91,7 +90,7 @@ def visualize_shit_interactive(model, sensors):
         prediction = predictions[0]
 
         fig.clf()
-        first_plot = plt.plot(
+        plt.plot(
             xAxisSensors, yAxisSensors, "ro",
             x_init, y_init, "bs",
             prediction[0], prediction[1], "g^"
@@ -108,21 +107,6 @@ def visualize_shit_interactive(model, sensors):
     x_slider.on_changed(update)
 
     plt.show()
-    plt.xlim(-0.1, 1.1)
-    plt.ylim(-0.1, 1.1)
-
-    x_slider = Slider(slider_ax, 'x', x_min, x_max, valinit=x_init )
-
-    def update(new_x):
-        test_distance = np.array([y_init, new_x])
-        prediction = model.predict(test_distance)
-        fig.canvas.draw_idle()  # redraw the plot
-
-    # the final step is to specify that the slider needs to
-    # execute the above function when its value changes
-    x_slider.on_changed(update)
-
-
 
 def visualize_error(model, sensors, size, dimension_count):
     targets, distances = generator.generate_data_matrix(size, dimension_count, sensors)
