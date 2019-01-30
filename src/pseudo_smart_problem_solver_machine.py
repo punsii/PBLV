@@ -27,36 +27,71 @@ def build_model(dimension_count, sensor_count):
     return model
 
 
-def predict_shit(model, test_distances, test_sensors, test_targets):
-    predictions = model.predict(test_distances)
+# Split data into targets and distance arrays
+def split_data(data):
+    targets = []
+    distances = []
 
-    xAxis = []
-    yAxis = []
+    for data_set in data:
+        targets.append(data_set[0])
+        distances.append(data_set[1])
+
+    return np.array(targets, dtype=float), np.array(distances, dtype=float)
+
+
+def visualize_shit_interactive(model, test_sensors):
+
+    from matplotlib.widgets import Slider
+
+    x_min = 0
+    x_max = 1
+    x_init = 0.5
+
+    y_min = 0
+    y_max = 1
+    y_init = 0.5
+
+    test_distance = np.array([y_init, x_init])
+    prediction = model.predict(test_distance)
+
+    xAxisSensors = []
+    yAxisSensors = []
     for sensor_pos in test_sensors:
-        xAxis.append(sensor_pos[0])
-        yAxis.append(sensor_pos[1])
+        xAxisSensors.append(sensor_pos[0])
+        yAxisSensors.append(sensor_pos[1])
 
-    xAxisTargets = []
-    yAxisTargets = []
-    for i in range(1):
-        target = test_targets[i]
-        xAxisTargets.append(target[0])
-        yAxisTargets.append(target[1])
+    fig = plt.figure()
 
-    xAxisPredictions = []
-    yAxisPredictions = []
-    for i in range(1):
-        prediction = predictions[i]
-        xAxisPredictions.append(prediction[0])
-        yAxisPredictions.append(prediction[1])
+    # first we create the general layount of the figure
+    # with two axes objects: one for the plot of the function
+    # and the other for the slider
+    main_ax = plt.axes([0.1, 0.2, 0.8, 0.65])
+    slider_ax = plt.axes([0.1, 0.05, 0.8, 0.05])
 
-    plt.plot(
-        xAxis, yAxis, "ro",
-        xAxisTargets, yAxisTargets, "bs",
-        xAxisPredictions, yAxisPredictions, "g^"
+    # in main_ax we plot the function with the initial value of the parameter a
+    plt.axes(main_ax)  # select main_ax
+    plt.title('prediction (x) vs real position (o)')
+    first_plot = plt.plot(
+        xAxisSensors, yAxisSensors, "ro",
+        x_init, y_init, "bs",
+        prediction[0], prediction[1], "g^"
     )
     plt.axis([0.0, 1.0, 0.0, 1.0])
     plt.show()
+    plt.xlim(-0.1, 1.1)
+    plt.ylim(-0.1, 1.1)
+
+    x_slider = Slider(slider_ax, 'x', x_min, x_max, valinit=x_init )
+
+    def update(new_x):
+        test_distance = np.array([y_init, new_x])
+        prediction = model.predict(test_distance)
+        fig.canvas.draw_idle()  # redraw the plot
+
+    # the final step is to specify that the slider needs to
+    # execute the above function when its value changes
+    x_slider.on_changed(update)
+
 
 
 def visualize_error(model, sensors, size, dimension_count):
