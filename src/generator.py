@@ -24,6 +24,20 @@ def generate_targets_rectified(number_of_targets, dimension, min_range, max_rang
     return targets
 
 
+def generate_target_normalized(dimension, mu, sigma):
+    pos = []
+    for i in range(dimension):
+        pos.append(random.normalvariate(mu, sigma))
+    return pos
+
+
+def generate_targets_normalized(number_of_targets, dimension, mu, sigma):
+    targets = []
+    for i in range(number_of_targets):
+        targets.append(generate_target_normalized(dimension, mu, sigma))
+    return targets
+
+
 def generate_target(dimension, min_range, max_range):
     pos = []
     for i in range(dimension):

@@ -6,7 +6,8 @@ def writeTestDataToFile(dimensions, sensor_count, count, out_file_name):
     file = open(out_file_name, "w+")  # Create file
 
     sensors = gen.generate_targets(sensor_count, dimensions, 0.0, 1.0)
-    targets = gen.generate_targets_rectified(count, dimensions, 0.0, 1.0, 0.8)
+    # targets = gen.generate_targets_rectified(count, dimensions, 0.0, 1.0, 0.8)
+    targets = gen.generate_targets_normalized(count, dimensions, 0.5, 0.1)
 
     # Write sensor positions in the first line.
     for sensor in sensors:
