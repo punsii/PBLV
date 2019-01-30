@@ -109,7 +109,7 @@ model = build_model(dimension_count, sensor_count)
 model.fit(distances, targets, epochs=10)
 
 # Test model
-test_sensors, test_targets, test_distances = test_data_reader.read_test_data("training", "../")
+test_sensors, test_targets, test_distances = test_data_reader.read_test_data("test", "../")
 
 test_loss, test_mae, test_mse = model.evaluate(test_distances, test_targets)
 print("Test MAE:", test_mae, ", Test MSE:", test_mse)
