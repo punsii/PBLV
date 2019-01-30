@@ -117,4 +117,4 @@ print("Test MAE:", test_mae, ", Test MSE:", test_mse)
 # Plot prediction
 predict_shit(model, test_distances, test_sensors, test_targets)
 
-visualize_error(model, test_sensors, size=100)
+visualize_error(model, sensors, size=100)
