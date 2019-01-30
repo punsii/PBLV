@@ -1,5 +1,5 @@
-import test_data_reader
-import generator
+from src import test_data_reader
+from src import generator
 
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
@@ -90,11 +90,16 @@ def visualize_shit_interactive(model, sensors):
         predictions = model.predict(test_distances)
         prediction = predictions[0]
 
-        plt.plot(
+        fig.clf()
+        first_plot = plt.plot(
             xAxisSensors, yAxisSensors, "ro",
             x_init, y_init, "bs",
             prediction[0], prediction[1], "g^"
         )
+        plt.axis([0.0, 1.0, 0.0, 1.0])
+
+        plt.xlim(-0.1, 1.1)
+        plt.ylim(-0.1, 1.1)
 
         fig.canvas.draw_idle()  # redraw the plot
 
@@ -200,7 +205,7 @@ learning_targets, testing_targets = targets[:data_split, :], targets[data_split:
 model = build_model(dimension_count, sensor_count)
 
 # Train model
-model.fit(learning_distances, learning_targets, epochs=1)
+model.fit(learning_distances, learning_targets, epochs=10)
 
 # Test model
 test_loss, test_mae, test_mse = model.evaluate(testing_distances, testing_targets)
