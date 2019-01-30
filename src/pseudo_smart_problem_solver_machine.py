@@ -51,8 +51,9 @@ def visualize_shit_interactive(model, sensors):
     y_max = 1
     y_init = 0.5
 
-    test_distance = np.array([y_init, x_init])
-    prediction = model.predict(test_distance)
+    test_distances = np.array([generator.calculate_distances(np.array([x_init, y_init]), sensors)])
+    predictions = model.predict(test_distances)
+    prediction = predictions[0]
 
     xAxisSensors = []
     yAxisSensors = []
@@ -189,7 +190,7 @@ learning_targets, testing_targets = targets[:data_split, :], targets[data_split:
 model = build_model(dimension_count, sensor_count)
 
 # Train model
-model.fit(learning_distances, learning_targets, epochs=10)
+model.fit(learning_distances, learning_targets, epochs=1)
 
 # Test model
 test_loss, test_mae, test_mse = model.evaluate(testing_distances, testing_targets)
