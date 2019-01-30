@@ -26,18 +26,6 @@ def build_model(dimension_count, sensor_count):
     return model
 
 
-# Split data into targets and distance arrays
-def split_data(data):
-    targets = []
-    distances = []
-
-    for data_set in data:
-        targets.append(data_set[0])
-        distances.append(data_set[1])
-
-    return np.array(targets, dtype=float), np.array(distances, dtype=float)
-
-
 def predict_shit(model, test_distances, test_sensors, test_targets):
     predictions = model.predict(test_distances)
 
@@ -103,17 +91,12 @@ def visualize_error(model, test_sensors, size):
 
 
 # Read data
-data = test_data_reader.read_test_data(file_name="../training_data.txt")
-
-samples = data[0]
-sensors = data[1]
+sensors, targets, distances = test_data_reader.read_test_data("training", "../")
 
 print(sensors)
 
-dimension_count = len(samples[0][0])
-sensor_count = len(samples[0][1])
-
-targets, distances = split_data(samples)
+dimension_count = len(sensors[0])
+sensor_count = len(sensors)
 
 print("Dimensions:", dimension_count)
 print("Sensors: ", sensor_count)
@@ -124,8 +107,7 @@ model = build_model(dimension_count, sensor_count)
 model.fit(distances, targets, epochs=10)
 
 # Test model
-test_samples, test_sensors = test_data_reader.read_test_data(file_name="../test_data.txt")
-test_targets, test_distances = split_data(test_samples)
+test_sensors, test_targets, test_distances = test_data_reader.read_test_data("training", "../")
 
 test_loss, test_mae, test_mse = model.evaluate(test_distances, test_targets)
 print("Test MAE:", test_mae, ", Test MSE:", test_mse)

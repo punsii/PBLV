@@ -1,35 +1,31 @@
 from src import generator as gen
+import numpy as np
 
 
 # Script will generate random test data and write it to a file.
-def writeTestDataToFile(dimensions, sensor_count, count, out_file_name):
-    file = open(out_file_name, "w+")  # Create file
-
-    sensors = gen.generate_targets(sensor_count, dimensions, 0.0, 1.0)
-    # targets = gen.generate_targets_rectified(count, dimensions, 0.0, 1.0, 0.8)
-    targets = gen.generate_targets_normalized(count, dimensions, 0.5, 0.1)
-
-    # Write sensor positions in the first line.
-    for sensor in sensors:
-        file.write(str(sensor) + ", ")
-    file.write("\n")
-
-    for target in targets:
-        distances = gen.calculate_distances(target, sensors)
-        file.write(str(target) + ", " + str(distances) + "\n")
-
-    file.close()
+def write_test_data_to_file(dimensions, sensor_count, count, file_prefix, directory="./"):
+    sensors = gen.generate_targets(sensor_count, dimensions)
+    targets = gen.generate_targets(count, dimensions)
+    distances = gen.apply_sensors_on_targets(targets, sensors)
+    with open(f"{directory}/{file_prefix}_sensors.txt", "w+") as file:
+        np.savetxt(file, sensors)
+    with open(f"{directory}/{file_prefix}_targets.txt", "w+") as file:
+        np.savetxt(file, targets)
+    with open(f"{directory}/{file_prefix}_distances.txt", "w+") as file:
+        np.savetxt(file, distances)
 
 
-writeTestDataToFile(
+write_test_data_to_file(
     dimensions=2,
     sensor_count=3,
     count=100000,
-    out_file_name="../training_data.txt"
+    file_prefix="training",
+    directory="../"
 )
-writeTestDataToFile(
+write_test_data_to_file(
     dimensions=2,
     sensor_count=3,
     count=100000,
-    out_file_name="../test_data.txt"
+    file_prefix="test",
+    directory="../"
 )
