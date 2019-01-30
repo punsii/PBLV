@@ -71,11 +71,17 @@ def predict_shit(model, test_distances, test_sensors, test_targets):
 
 
 def visualize_error(model, test_sensors, size):
-    xaxis = np.linspace(0, 1, 10)
-    yaxis = np.linspace(0, 1, 10)
-    loss, mae, mse = model.evaluate(xaxis[:, None], yaxis[None, :])
+    x = np.linspace(0, 1, size)
+    y = np.linspace(0, 1, size)
+    z = np.zeros((size,size))
 
-    h = plt.contourf(xaxis, yaxis, mae)
+    for cur_x in x:
+        for cur_y in y:
+            target = [x, y]
+            distance = np.array([generator.calculate_distances(target, test_sensors)], dtype=float)
+            loss, z[cur_x, cur_y], mse = model.evaluate(distance, target)
+
+    h = plt.contourf(x, y, z)
 
 
 # Read data
