@@ -103,18 +103,21 @@ sensor_count = len(sensors)
 print("Dimensions:", dimension_count)
 print("Sensors: ", sensor_count)
 
+data_length = len(distances)
+data_split = int(data_length * 0.8)
+learning_distances, testing_distances = distances[:data_split,:], distances[data_split:,:]
+learning_targets, testing_targets = targets[:data_split,:], targets[data_split:,:]
+
 model = build_model(dimension_count, sensor_count)
 
 # Train model
-model.fit(distances, targets, epochs=10)
+model.fit(learning_distances, learning_targets, epochs=10)
 
 # Test model
-test_sensors, test_targets, test_distances = test_data_reader.read_test_data("test", "../")
-
-test_loss, test_mae, test_mse = model.evaluate(test_distances, test_targets)
+test_loss, test_mae, test_mse = model.evaluate(testing_distances, testing_targets)
 print("Test MAE:", test_mae, ", Test MSE:", test_mse)
 
 # Plot prediction
-predict_shit(model, test_distances, test_sensors, test_targets)
+predict_shit(model, testing_distances, sensors, testing_targets)
 
 visualize_error(model, sensors, size=100)
