@@ -1,6 +1,29 @@
 import random
 
 
+def generate_target_rectified(dimension, min_range, max_range, percentage_of_border_targets):
+    if random.uniform(0.0, 1.0) > percentage_of_border_targets:
+        return generate_target(dimension, min_range, max_range)
+    n = random.randrange(0, dimension)
+    pos = []
+    for i in range(dimension):
+        if i is n:
+            pos.append(random.uniform(min_range, max_range))
+        else:
+            if random.uniform(0.0, 1.0) >= 0.5:
+                pos.append(max_range)
+            else:
+                pos.append(min_range)
+    return pos
+
+
+def generate_targets_rectified(number_of_targets, dimension, min_range, max_range, percentage_of_border_targets):
+    targets = []
+    for i in range(number_of_targets):
+        targets.append(generate_target_rectified(dimension, min_range, max_range, percentage_of_border_targets))
+    return targets
+
+
 def generate_target(dimension, min_range, max_range):
     pos = []
     for i in range(dimension):
