@@ -1,3 +1,5 @@
+import numpy as np
+
 # Read test data from the passed file name.
 def read_test_data(file_name):
     samples = []
@@ -11,7 +13,7 @@ def read_test_data(file_name):
                 samples.append(_parse_line(line))
             index = index + 1
 
-    return samples, sensors
+    return np.array(samples), np.array(sensors)
 
 
 def _parse_first_line(line):
