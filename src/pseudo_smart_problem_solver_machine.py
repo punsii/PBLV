@@ -86,13 +86,12 @@ def visualize_shit_interactive(model, sensors):
 
     #Define x-slider
     x_axis = plt.axes([0.125, 0.01, 0.78, 0.04])
-    y_axis = plt.axes([-0.1, 0.3, 0.04, 0.78])
+    y_axis = plt.axes([0, 0.3, 0.04, 0.78])
     x_slider = Slider(x_axis, 'x', 0, 1, valinit=0.5)
-    y_slider = Slider(y_axis, 'x', 0, 1, valinit=0.5, orientation="vertical")
+    y_slider = Slider(y_axis, 'x', 0, 1, valinit=0.5)
 
     def onklick(event):
-        #event.button, event.x,t,xdata,ydata
-        print(event)
+        update(subplot, event.xdata, event.ydata)
 
     fig.canvas.mpl_connect('button_press_event', onklick)
 
