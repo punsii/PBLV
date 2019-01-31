@@ -58,48 +58,54 @@ def predict_shit(model, test_distances, test_sensors, test_targets):
     plt.show()
 
 
-def visualize_error(model, test_sensors, size):
-    x = np.arange(size)
-    y = np.arange(size)
-    z = np.zeros((size, size), dtype=float)
+def visualize_error(model, sensors, size, dimension_count):
+    targets, distances = generator.generate_data_matrix(size, dimension_count, sensors)
 
-    distances_to_predict = np.zeros(shape=(size * size, len(test_sensors)), dtype=float)
-    targets = np.zeros(shape=(size * size, 2), dtype=float)
+    predictions = model.predict(distances)
 
-    for column in x:
-        for row in y:
-            target = np.array([column, row]) / size
-            targets[column * row + row] = target
-            distances_to_predict[column * row + row] = generator.calculate_distances(target, test_sensors)
+    def calculate_errors(predicted_targets, original_targets):
+        errors = np.zeros((len(predicted_targets),))
 
-    predictions = model.predict(distances_to_predict)
+        for i in range(len(predicted_targets)):
+            errors[i] = np.linalg.norm(predicted_targets[i] - original_targets[i])
 
-    for column in x:
-        for row in y:
-            index = column * row + row
+        return errors
 
-            prediction = predictions[index]
-            target = targets[index]
+    def draw_2d_chart(size, predictions, targets):
+        x = np.arange(size)
+        y = np.arange(size)
+        z = np.zeros((size, size), dtype=float)
 
-            z[column, row] = np.linalg.norm(prediction - target)
+        for column in x:
+            for row in y:
+                index = column * row + row
 
-    print("Max error:", z.max(), ", Min error:", z.min(), ", Average error:", z.mean())
+                prediction = predictions[index]
+                target = targets[index]
 
-    x = np.linspace(0.0, 1.0, size)
-    y = np.linspace(0.0, 1.0, size)
-    plt.plot()
-    plt.contourf(x, y, z)
-    plt.show()
+                z[column, row] = np.linalg.norm(prediction - target)
+
+        x = np.linspace(0.0, 1.0, size)
+        y = np.linspace(0.0, 1.0, size)
+        plt.plot()
+        plt.contourf(x, y, z)
+        plt.show()
+
+    errors = calculate_errors(predictions, targets)
+    print("Max error:", errors.max(), ", Min error:", errors.min(), ", Average error:", errors.mean())
+
+    if dimension_count == 2:
+        draw_2d_chart(size, predictions, targets)
 
 
 # Read data
-# sensors, targets, distances = test_data_reader.read_test_data("training", "../")
+sensors, targets, distances = test_data_reader.read_test_data("training", "../")
 
-dimension_count = 2
-sensor_count = 3
+dimension_count = len(targets[0])
+sensor_count = len(distances[0])
 
-sensors = generator.generate_targets(sensor_count, dimension_count)
-targets, distances = generator.generate_data_matrix(300, dimension_count, sensors)
+# sensors = generator.generate_targets(sensor_count, dimension_count)
+# targets, distances = generator.generate_data_matrix(50, dimension_count, sensors)
 
 print(sensors)
 
@@ -108,8 +114,8 @@ print("Sensors: ", sensor_count)
 
 data_length = len(distances)
 data_split = int(data_length * 0.8)
-learning_distances, testing_distances = distances[:data_split,:], distances[data_split:,:]
-learning_targets, testing_targets = targets[:data_split,:], targets[data_split:,:]
+learning_distances, testing_distances = distances[:data_split, :], distances[data_split:, :]
+learning_targets, testing_targets = targets[:data_split, :], targets[data_split:, :]
 
 model = build_model(dimension_count, sensor_count)
 
@@ -123,4 +129,4 @@ print("Test MAE:", test_mae, ", Test MSE:", test_mse)
 # Plot prediction
 predict_shit(model, testing_distances, sensors, testing_targets)
 
-visualize_error(model, sensors, size=100)
+visualize_error(model, sensors, size=10, dimension_count=dimension_count)
