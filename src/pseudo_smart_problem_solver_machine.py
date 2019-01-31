@@ -178,7 +178,7 @@ def visualize_error(model, sensors, size, dimension_count):
 
 
 # Read data
-sensors, targets, distances = test_data_reader.read_test_data("3d_5s", "../")
+sensors, targets, distances = test_data_reader.read_test_data("2d_3s", "../")
 
 dimension_count = len(targets[0])
 sensor_count = len(distances[0])
