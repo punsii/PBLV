@@ -1,7 +1,8 @@
-from src import test_data_reader
-from src import generator
+import test_data_reader
+import generator
 
 import matplotlib.pyplot as plt
+from matplotlib.widgets import Slider
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -88,22 +89,20 @@ def visualize_error(model, sensors, size, dimension_count):
         plt.contourf(x, y, z)
         plt.show()
 
-    def draw_3d_chart(size, errors):
-        x = np.arange(size)
-        y = np.arange(size)
-        z = np.zeros((size, size), dtype=float)
+    def draw_3d_chart(size, errors, plot, z_index=0):
+        x_axis = np.arange(size)
+        y_axis = np.arange(size)
 
-        for column in x:
-            for row in y:
-                index = column * row + row
+        matrix = np.zeros((size, size), dtype=float)
 
-                z[column, row] = errors[index][0]
+        for x in x_axis:
+            for y in y_axis:
+                matrix[x, y] = errors[x * (size ** 2) + y * size + z_index]
 
-        x = np.linspace(0.0, 1.0, size)
-        y = np.linspace(0.0, 1.0, size)
-        plt.plot()
-        plt.contourf(x, y, z)
-        plt.show()
+        x_axis = np.linspace(0.0, 1.0, size)
+        y_axis = np.linspace(0.0, 1.0, size)
+
+        return plot.contourf(x_axis, y_axis, matrix)
 
     errors = calculate_errors(predictions, targets)
 
@@ -116,11 +115,25 @@ def visualize_error(model, sensors, size, dimension_count):
     if dimension_count == 2:
         draw_2d_chart(size, errors)
     elif dimension_count == 3:
-        draw_3d_chart(size, errors)
+        fig = plt.figure(figsize=(1, 1))
+        sub_plot = fig.add_subplot(111)
+
+        draw_3d_chart(size, errors, sub_plot)
+
+        slider_ax = plt.axes([0.1, 0.05, 0.8, 0.05])
+        z_slider = Slider(ax=slider_ax, label="z", valmin=0.0, valmax=1.0, valinit=0.5)
+
+        def update(value):
+            draw_3d_chart(size, errors, sub_plot, z_index=int(min(value * size, size)))
+            fig.canvas.draw_idle()
+
+        z_slider.on_changed(update)
+
+        plt.show()
 
 
 # Read data
-sensors, targets, distances = test_data_reader.read_test_data("2d_3s", "../")
+sensors, targets, distances = test_data_reader.read_test_data("3d_5s", "../")
 
 dimension_count = len(targets[0])
 sensor_count = len(distances[0])
