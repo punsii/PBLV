@@ -7,8 +7,8 @@ import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 
-from src import test_data_reader
-from src import generator
+import test_data_reader
+import generator
 
 
 
@@ -48,76 +48,57 @@ def visualize_shit_interactive(model, sensors):
     """
     Plot an interacitve prediction graph.
     """
+
     from matplotlib.widgets import Slider
 
-    x_min = 0
-    x_max = 1
-    x_init = 0.5
-
-    y_min = 0
-    y_max = 1
-    y_init = 0.5
-
-    test_distances = np.array([generator.calculate_distances(np.array([x_init, y_init]), sensors)])
-    predictions = model.predict(test_distances)
-    prediction = predictions[0]
-
-    xAxisSensors = []
-    yAxisSensors = []
-    for sensor_pos in sensors:
-        xAxisSensors.append(sensor_pos[0])
-        yAxisSensors.append(sensor_pos[1])
-
-    fig = plt.figure()
-
-    # first we create the general layount of the figure
-    # with two axes objects: one for the plot of the function
-    # and the other for the slider
-    main_ax = plt.axes([0.1, 0.2, 0.8, 0.65])
-    slider_ax = plt.axes([0.1, 0.05, 0.8, 0.05])
-
-    # in main_ax we plot the function with the initial value of the parameter a
-    plt.sca(main_ax)  # select main_ax
-    plt.title('prediction (x) vs real position (o)')
-    first_plot = plt.plot(
-        xAxisSensors, yAxisSensors, "ro",
-        x_init, y_init, "bs",
-        prediction[0], prediction[1], "g^"
-    )
-    plt.axis([0.0, 1.0, 0.0, 1.0])
-
-    plt.xlim(-0.1, 1.1)
-    plt.ylim(-0.1, 1.1)
-
-    x_slider = Slider(slider_ax, 'x', x_min, x_max, valinit=x_init)
-
-    def update(new_x):
+    def update(subplot, new_x, new_y):
         """
         update the canvas when slider was moved
         """
-        global prediction
-
-        test_distances = np.array([generator.calculate_distances(np.array([new_x, y_init]), sensors)])
+        test_distances = np.array([generator.calculate_distances(np.array([new_x, new_y]), sensors)])
         predictions = model.predict(test_distances)
         prediction = predictions[0]
 
-        fig.clf()
-        plt.plot(
-            xAxisSensors, yAxisSensors, "ro",
-            x_init, y_init, "bs",
-            prediction[0], prediction[1], "g^"
+        subplot.clear()
+        subplot.plot(
+            x_axis_sensors, y_axis_sensors, "g^",
+            new_x, new_y, "bo",
+            prediction[0], prediction[1], "rx"
         )
-        plt.axis([0.0, 1.0, 0.0, 1.0])
 
-        plt.xlim(-0.1, 1.1)
-        plt.ylim(-0.1, 1.1)
+        subplot.axis([0.0, 1.0, 0.0, 1.0])
+        plt.xlim(0, 1)
+        plt.ylim(0, 1)
 
         fig.canvas.draw_idle()  # redraw the plot
 
-    # the final step is to specify that the slider needs to
-    # execute the above function when its value changes
-    x_slider.on_changed(update)
+    x_axis_sensors = []
+    y_axis_sensors = []
+    for sensor_pos in sensors:
+        x_axis_sensors.append(sensor_pos[0])
+        y_axis_sensors.append(sensor_pos[1])
 
+    #Plot
+    fig = plt.figure()
+    plt.title('prediction (x) vs real position (o)')
+    subplot = fig.add_subplot(111)
+    update(subplot, 0.5, 0.5)
+
+    #Define x-slider
+    x_axis = plt.axes([0.125, 0.01, 0.78, 0.04])
+    y_axis = plt.axes([-0.1, 0.3, 0.04, 0.78])
+    x_slider = Slider(x_axis, 'x', 0, 1, valinit=0.5)
+    y_slider = Slider(y_axis, 'x', 0, 1, valinit=0.5, orientation="vertical")
+
+    def onklick(event):
+        #event.button, event.x,t,xdata,ydata
+        print(event)
+
+    fig.canvas.mpl_connect('button_press_event', onklick)
+
+    #Let's rock
+    y_slider.on_changed(lambda y_val: update(subplot, x_slider.val, y_val))
+    x_slider.on_changed(lambda x_val: update(subplot, x_val, y_slider.val))
     plt.show()
 
 def visualize_error(model, sensors, size, dimension_count):
@@ -218,7 +199,7 @@ learning_targets, testing_targets = targets[:data_split, :], targets[data_split:
 model = build_model(dimension_count, sensor_count)
 
 # Train model
-model.fit(learning_distances, learning_targets, epochs=10)
+model.fit(learning_distances, learning_targets, epochs=1)
 
 # Test model
 test_loss, test_mae, test_mse = model.evaluate(testing_distances, testing_targets)
