@@ -22,10 +22,3 @@ write_test_data_to_file(
     file_prefix="training",
     directory="../"
 )
-write_test_data_to_file(
-    dimensions=2,
-    sensor_count=3,
-    count=100000,
-    file_prefix="test",
-    directory="../"
-)
