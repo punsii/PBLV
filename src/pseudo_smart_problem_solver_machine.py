@@ -71,7 +71,7 @@ def visualize_error(model, sensors, size, dimension_count):
 
         return errors
 
-    def draw_2d_chart(size, predictions, targets):
+    def draw_2d_chart(size, errors):
         x = np.arange(size)
         y = np.arange(size)
         z = np.zeros((size, size), dtype=float)
@@ -80,10 +80,24 @@ def visualize_error(model, sensors, size, dimension_count):
             for row in y:
                 index = column * row + row
 
-                prediction = predictions[index]
-                target = targets[index]
+                z[column, row] = errors[index]
 
-                z[column, row] = np.linalg.norm(prediction - target)
+        x = np.linspace(0.0, 1.0, size)
+        y = np.linspace(0.0, 1.0, size)
+        plt.plot()
+        plt.contourf(x, y, z)
+        plt.show()
+
+    def draw_3d_chart(size, errors):
+        x = np.arange(size)
+        y = np.arange(size)
+        z = np.zeros((size, size), dtype=float)
+
+        for column in x:
+            for row in y:
+                index = column * row + row
+
+                z[column, row] = errors[index][0]
 
         x = np.linspace(0.0, 1.0, size)
         y = np.linspace(0.0, 1.0, size)
@@ -100,7 +114,9 @@ def visualize_error(model, sensors, size, dimension_count):
     print("==========")
 
     if dimension_count == 2:
-        draw_2d_chart(size, predictions, targets)
+        draw_2d_chart(size, errors)
+    elif dimension_count == 3:
+        draw_3d_chart(size, errors)
 
 
 # Read data
@@ -125,7 +141,7 @@ learning_targets, testing_targets = targets[:data_split, :], targets[data_split:
 model = build_model(dimension_count, sensor_count)
 
 # Train model
-model.fit(learning_distances, learning_targets, epochs=10)
+model.fit(learning_distances, learning_targets, epochs=1)
 
 # Test model
 test_loss, test_mae, test_mse = model.evaluate(testing_distances, testing_targets)
