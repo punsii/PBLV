@@ -1,17 +1,21 @@
-from src import test_data_reader
-from src import generator
-
+"""
+Module for training and evaluating position-estimating neural net
+"""
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 import numpy as np
-import pandas as pd
-import seaborn as sns
 import tensorflow as tf
 from tensorflow import keras
 
+from src import test_data_reader
+from src import generator
 
-# Build TensorFlow model
+
+
 def build_model(dimension_count, sensor_count):
+    """
+    Configure and compile tensorFlow model.
+    """
     model = keras.Sequential([
         keras.layers.Dense(20 * sensor_count, activation=tf.nn.relu, input_shape=(sensor_count,)),
         keras.layers.Dense(20 * sensor_count, activation=tf.nn.softmax),
@@ -27,8 +31,10 @@ def build_model(dimension_count, sensor_count):
     return model
 
 
-# Split data into targets and distance arrays
 def split_data(data):
+    """
+    Split data in target and distance array.
+    """
     targets = []
     distances = []
 
@@ -39,6 +45,9 @@ def split_data(data):
     return np.array(targets, dtype=float), np.array(distances, dtype=float)
 
 def visualize_shit_interactive(model, sensors):
+    """
+    Plot an interacitve prediction graph.
+    """
     from matplotlib.widgets import Slider
 
     x_min = 0
@@ -83,6 +92,9 @@ def visualize_shit_interactive(model, sensors):
     x_slider = Slider(slider_ax, 'x', x_min, x_max, valinit=x_init)
 
     def update(new_x):
+        """
+        update the canvas when slider was moved
+        """
         global prediction
 
         test_distances = np.array([generator.calculate_distances(np.array([new_x, y_init]), sensors)])
@@ -109,6 +121,9 @@ def visualize_shit_interactive(model, sensors):
     plt.show()
 
 def visualize_error(model, sensors, size, dimension_count):
+    """
+    Draw a 2D-heatmap of prediction errors for a (size x size) grid.
+    """
     targets, distances = generator.generate_data_matrix(size, dimension_count, sensors)
 
     predictions = model.predict(distances)

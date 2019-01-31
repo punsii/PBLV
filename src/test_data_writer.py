@@ -1,10 +1,15 @@
+"""
+Module for writing generated testdata to file
+"""
 from src import generator as gen
 import numpy as np
 
 
-# Script will generate random test data and write it to a file.
 def write_test_data_to_file(dimensions, sensor_count, count, file_prefix, directory="./"):
     sensors = gen.generate_targets(sensor_count, dimensions)
+    """
+    Script will generate random test data and write it to a file.
+    """
     targets = gen.generate_targets(count, dimensions)
     distances = gen.apply_sensors_on_targets(targets, sensors)
     with open(f"{directory}/{file_prefix}_sensors.txt", "w+") as file:
