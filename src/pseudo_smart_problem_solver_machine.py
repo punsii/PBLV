@@ -198,7 +198,7 @@ learning_targets, testing_targets = targets[:data_split, :], targets[data_split:
 model = build_model(dimension_count, sensor_count)
 
 tbCallBack = tf.keras.callbacks.TensorBoard(log_dir='../log',
-                                            histogram_freq=1,
+                                            histogram_freq=0,
                                             write_graph=True,
                                             write_grads=True,
                                             write_images=True,
