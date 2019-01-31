@@ -141,7 +141,7 @@ learning_targets, testing_targets = targets[:data_split, :], targets[data_split:
 model = build_model(dimension_count, sensor_count)
 
 # Train model
-model.fit(learning_distances, learning_targets, epochs=1)
+model.fit(learning_distances, learning_targets, epochs=10)
 
 # Test model
 test_loss, test_mae, test_mse = model.evaluate(testing_distances, testing_targets)
