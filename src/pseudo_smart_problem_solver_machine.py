@@ -205,12 +205,10 @@ tbCallBack = tf.keras.callbacks.TensorBoard(log_dir='../log',
                                             batch_size=32)
 
 # Train model
-model.fit(distances, targets, epochs=10,
-          validation_data=(distances, targets),
-          #workarounf for tBoard histogramm functionality
+model.fit(learning_distances, learning_targets, epochs=1,
+          validation_data=(learning_distances, learning_targets),
+          #workarounf for tboard histogramm functionality
           callbacks=[tbCallBack])
-# Train model
-model.fit(learning_distances, learning_targets, epochs=1)
 
 # Test model
 test_loss, test_mae, test_mse = model.evaluate(testing_distances, testing_targets)
