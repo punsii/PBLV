@@ -197,6 +197,18 @@ learning_targets, testing_targets = targets[:data_split, :], targets[data_split:
 
 model = build_model(dimension_count, sensor_count)
 
+tbCallBack = tf.keras.callbacks.TensorBoard(log_dir='../log',
+                                            histogram_freq=1,
+                                            write_graph=True,
+                                            write_grads=True,
+                                            write_images=True,
+                                            batch_size=32)
+
+# Train model
+model.fit(distances, targets, epochs=10,
+          validation_data=(distances, targets),
+          #workarounf for tBoard histogramm functionality
+          callbacks=[tbCallBack])
 # Train model
 model.fit(learning_distances, learning_targets, epochs=1)
 
