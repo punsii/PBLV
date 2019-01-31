@@ -92,14 +92,19 @@ def visualize_error(model, sensors, size, dimension_count):
         plt.show()
 
     errors = calculate_errors(predictions, targets)
-    print("Max error:", errors.max(), ", Min error:", errors.min(), ", Average error:", errors.mean())
+
+    print("===== ERRORS - Deviation of the predicted target to the actual target =====")
+    print("MAX:", errors.max())
+    print("MIN:", errors.max())
+    print("AVG:", errors.mean())
+    print("==========")
 
     if dimension_count == 2:
         draw_2d_chart(size, predictions, targets)
 
 
 # Read data
-sensors, targets, distances = test_data_reader.read_test_data("training", "../")
+sensors, targets, distances = test_data_reader.read_test_data("2d_3s", "../")
 
 dimension_count = len(targets[0])
 sensor_count = len(distances[0])
