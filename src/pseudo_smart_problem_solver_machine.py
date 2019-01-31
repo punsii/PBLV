@@ -93,12 +93,15 @@ def visualize_error(model, test_sensors, size):
 
 
 # Read data
-sensors, targets, distances = test_data_reader.read_test_data("training", "../")
+# sensors, targets, distances = test_data_reader.read_test_data("training", "../")
+
+dimension_count = 2
+sensor_count = 3
+
+sensors = generator.generate_targets(sensor_count, dimension_count)
+targets, distances = generator.generate_data_matrix(300, dimension_count, sensors)
 
 print(sensors)
-
-dimension_count = len(sensors[0])
-sensor_count = len(sensors)
 
 print("Dimensions:", dimension_count)
 print("Sensors: ", sensor_count)
