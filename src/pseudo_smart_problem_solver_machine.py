@@ -95,7 +95,7 @@ def visualize_error(model, sensors, size, dimension_count):
 
     print("===== ERRORS - Deviation of the predicted target to the actual target =====")
     print("MAX:", errors.max())
-    print("MIN:", errors.max())
+    print("MIN:", errors.min())
     print("AVG:", errors.mean())
     print("==========")
 
