@@ -111,7 +111,7 @@ def visualize_error_interactive(model, sensors, size, dimension_count):
     def draw_plot(subplot, size, errors, cur_pos):
         if len(errors.shape) == 3:
             # Take 2D slice of 3D data
-            errors = errors[:, :, int(cur_pos[2] * size)]
+            errors = errors[:, :, int(cur_pos[2] * (size - 1))]
 
         subplot.clear()
         cont_plot = subplot.contourf(np.linspace(0.0, 1.0, size),
@@ -124,7 +124,7 @@ def visualize_error_interactive(model, sensors, size, dimension_count):
         prediction = model.predict(example_distances)[0]
 
         subplot.plot(
-            cur_pos[0], cur_pos[1], "bo",
+            cur_pos[0], cur_pos[1], "ko",
             prediction[0], prediction[1], "rx"
         )
 
@@ -182,7 +182,7 @@ def visualize_error_interactive(model, sensors, size, dimension_count):
 
         slider_ax = plt.axes([0.125, 0.01, 0.78, 0.04])
         z_slider = Slider(ax=slider_ax, label="z",
-                          valmin=0.0, valmax=0.99, valinit=0)
+                          valmin=0.0, valmax=1.0, valinit=0)
 
         def update(subplot, cur_pos, value):
             cur_pos[2] = value
@@ -194,7 +194,7 @@ def visualize_error_interactive(model, sensors, size, dimension_count):
     plt.show()
 
 # Read data
-sensors, targets, distances = test_data_reader.read_test_data("2d_3s", "../")
+sensors, targets, distances = test_data_reader.read_test_data("3d_5s", "../")
 
 dimension_count = len(targets[0])
 sensor_count = len(distances[0])
@@ -226,4 +226,4 @@ print("Test MAE:", test_mae, ", Test MSE:", test_mse)
 
 # Plot prediction for 2D or 3D data
 if 2 <= dimension_count <= 3:
-    visualize_error_interactive(model, sensors, 200, dimension_count)
+    visualize_error_interactive(model, sensors, 60, dimension_count)
