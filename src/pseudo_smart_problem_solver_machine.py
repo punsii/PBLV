@@ -113,7 +113,7 @@ def visualize_error(model, sensors, size, dimension_count):
     def calculate_errors(predicted_targets, original_targets):
         errors = np.zeros((len(predicted_targets),))
 
-        for i in enumerate(predicted_targets):
+        for i, _ in enumerate(predicted_targets):
             errors[i] = np.linalg.norm(
                 predicted_targets[i] - original_targets[i])
 
