@@ -24,6 +24,6 @@ write_test_data_to_file(
     dimensions=2,
     sensor_count=3,
     count=100000,
-    file_prefix="2d_3s",
+    file_prefix="shitty_2d_3s",
     directory="../"
 )
