@@ -46,7 +46,7 @@ def split_data(data):
     return np.array(targets, dtype=float), np.array(distances, dtype=float)
 
 
-#def visualize_shit_interactive(model, sensors):
+# def visualize_shit_interactive(model, sensors):
 #    """
 #    Plot an interacitve prediction graph.
 #    """
@@ -115,8 +115,8 @@ def visualize_error_interactive(model, sensors, size, dimension_count):
 
         subplot.clear()
         cont_plot = subplot.contourf(np.linspace(0.0, 1.0, size),
-                         np.linspace(0.0, 1.0, size),
-                         errors.transpose(), cmap=cm.PuBu_r)
+                                     np.linspace(0.0, 1.0, size),
+                                     errors.transpose(), cmap=cm.PuBu_r)
 
         example_distances = np.array([
             generator.calculate_distances(np.array(cur_pos), sensors)
@@ -152,7 +152,6 @@ def visualize_error_interactive(model, sensors, size, dimension_count):
         cur_pos = [0.5, 0.5, 0]
         errors = np.reshape(errors, (size, size, size))
 
-
     print(cur_pos)
 
     print("===== ERRORS - Deviation of the predicted target to the actual target =====")
@@ -179,7 +178,6 @@ def visualize_error_interactive(model, sensors, size, dimension_count):
 
     # Slider for z-axis if present
     if dimension_count == 3:
-
         slider_ax = plt.axes([0.125, 0.01, 0.78, 0.04])
         z_slider = Slider(ax=slider_ax, label="z",
                           valmin=0.0, valmax=1.0, valinit=0)
@@ -193,36 +191,46 @@ def visualize_error_interactive(model, sensors, size, dimension_count):
 
     plt.show()
 
-# Read data
-sensors, targets, distances = test_data_reader.read_test_data("3d_5s", "../")
 
-dimension_count = len(targets[0])
-sensor_count = len(distances[0])
+def dataset_generator(sensors, dimension_count, batch_size):
+    """
+    Keras data generator function.
+    :param sensors: positions of the sensors
+    :param batch_size: size of the batch
+    :return:
+    """
+    while True:
+        targets = generator.generate_targets(batch_size, dimension_count)
+        distances = generator.apply_sensors_on_targets(targets, sensors)
 
-# sensors = generator.generate_targets(sensor_count, dimension_count)
-# targets, distances = generator.generate_data_matrix(50, dimension_count, sensors)
+        yield distances, targets
 
-print(sensors)
 
-print("Dimensions:", dimension_count)
-print("Sensors: ", sensor_count)
+def train_model(dimension_count, sensor_count, batch_size, steps, validation_steps, epochs):
+    model = build_model(dimension_count, sensor_count)
 
-data_length = len(distances)
-data_split = int(data_length * 0.8)
-learning_distances, testing_distances = \
-    distances[:data_split, :], distances[data_split:, :]
-learning_targets, testing_targets = \
-    targets[:data_split, :], targets[data_split:, :]
+    sensors = generator.generate_targets(sensor_count, dimension_count)
 
-model = build_model(dimension_count, sensor_count)
+    model.fit_generator(
+        generator=dataset_generator(sensors=sensors, dimension_count=dimension_count, batch_size=batch_size),
+        steps_per_epoch=steps,
+        validation_data=dataset_generator(sensors=sensors, dimension_count=dimension_count, batch_size=batch_size),
+        validation_steps=validation_steps,
+        epochs=epochs
+    )
 
-# Train model
-model.fit(learning_distances, learning_targets, epochs=1)
+    return model, sensors
 
-# Test model
-test_loss, test_mae, test_mse = \
-    model.evaluate(testing_distances, testing_targets)
-print("Test MAE:", test_mae, ", Test MSE:", test_mse)
+
+dimension_count = 2
+model, sensors = train_model(
+    dimension_count=dimension_count,
+    sensor_count=3,
+    batch_size=100,
+    steps=1000,
+    validation_steps=200,
+    epochs=5
+)
 
 # Plot prediction for 2D or 3D data
 if 2 <= dimension_count <= 3:
