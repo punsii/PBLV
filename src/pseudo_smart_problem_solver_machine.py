@@ -11,13 +11,13 @@ import test_data_reader
 import generator
 
 
-
 def build_model(dimension_count, sensor_count):
     """
     Configure and compile tensorFlow model.
     """
     model = keras.Sequential([
-        keras.layers.Dense(20 * sensor_count, activation=tf.nn.relu, input_shape=(sensor_count,)),
+        keras.layers.Dense(20 * sensor_count, activation=tf.nn.relu,
+                           input_shape=(sensor_count,)),
         keras.layers.Dense(20 * sensor_count, activation=tf.nn.softmax),
         keras.layers.Dense(dimension_count)
     ])
@@ -44,18 +44,19 @@ def split_data(data):
 
     return np.array(targets, dtype=float), np.array(distances, dtype=float)
 
+
 def visualize_shit_interactive(model, sensors):
     """
     Plot an interacitve prediction graph.
     """
 
-    from matplotlib.widgets import Slider
-
     def update(subplot, new_x, new_y):
         """
         update the canvas when slider was moved
         """
-        test_distances = np.array([generator.calculate_distances(np.array([new_x, new_y]), sensors)])
+        test_distances = np.array([
+            generator.calculate_distances(np.array([new_x, new_y]), sensors)
+        ])
         predictions = model.predict(test_distances)
         prediction = predictions[0]
 
@@ -78,13 +79,13 @@ def visualize_shit_interactive(model, sensors):
         x_axis_sensors.append(sensor_pos[0])
         y_axis_sensors.append(sensor_pos[1])
 
-    #Plot
+    # Plot
     fig = plt.figure()
     plt.title('prediction (x) vs real position (o)')
     subplot = fig.add_subplot(111)
     update(subplot, 0.5, 0.5)
 
-    #Define x-slider
+    # Define x-slider
     x_axis = plt.axes([0.125, 0.01, 0.78, 0.04])
     y_axis = plt.axes([0, 0.3, 0.04, 0.78])
     x_slider = Slider(x_axis, 'x', 0, 1, valinit=0.5)
@@ -95,7 +96,7 @@ def visualize_shit_interactive(model, sensors):
 
     fig.canvas.mpl_connect('button_press_event', onklick)
 
-    #Let's rock
+    # Let's rock
     y_slider.on_changed(lambda y_val: update(subplot, x_slider.val, y_val))
     x_slider.on_changed(lambda x_val: update(subplot, x_val, y_slider.val))
     plt.show()
@@ -104,49 +105,33 @@ def visualize_error(model, sensors, size, dimension_count):
     """
     Draw a 2D-heatmap of prediction errors for a (size x size) grid.
     """
-    targets, distances = generator.generate_data_matrix(size, dimension_count, sensors)
+    targets, distances = \
+        generator.generate_data_matrix(size, dimension_count, sensors)
 
     predictions = model.predict(distances)
 
     def calculate_errors(predicted_targets, original_targets):
         errors = np.zeros((len(predicted_targets),))
 
-        for i in range(len(predicted_targets)):
-            errors[i] = np.linalg.norm(predicted_targets[i] - original_targets[i])
+        for i in enumerate(predicted_targets):
+            errors[i] = np.linalg.norm(
+                predicted_targets[i] - original_targets[i])
 
         return errors
 
-    def draw_2d_chart(size, errors):
-        x = np.arange(size)
-        y = np.arange(size)
-        z = np.zeros((size, size), dtype=float)
+    def draw_contour_plot(size, errors, z_index=0):
+        values = np.zeros((size, size), dtype=float)
 
-        for column in x:
-            for row in y:
-                index = column * row + row
+        for column in range(size):
+            for row in range(size):
+                index = z_index * (size ** 2) + column * size + row
+                values[column, row] = errors[index]
 
-                z[column, row] = errors[index]
-
-        x = np.linspace(0.0, 1.0, size)
-        y = np.linspace(0.0, 1.0, size)
         plt.plot()
-        plt.contourf(x, y, z)
+        plt.contourf(np.linspace(0.0, 1.0, size),
+                     np.linspace(0.0, 1.0, size),
+                     values)
         plt.show()
-
-    def draw_3d_chart(size, errors, plot, z_index=0):
-        x_axis = np.arange(size)
-        y_axis = np.arange(size)
-
-        matrix = np.zeros((size, size), dtype=float)
-
-        for x in x_axis:
-            for y in y_axis:
-                matrix[x, y] = errors[x * (size ** 2) + y * size + z_index]
-
-        x_axis = np.linspace(0.0, 1.0, size)
-        y_axis = np.linspace(0.0, 1.0, size)
-
-        return plot.contourf(x_axis, y_axis, matrix)
 
     errors = calculate_errors(predictions, targets)
 
@@ -157,18 +142,20 @@ def visualize_error(model, sensors, size, dimension_count):
     print("==========")
 
     if dimension_count == 2:
-        draw_2d_chart(size, errors)
+        draw_contour_plot(size, errors)
     elif dimension_count == 3:
         fig = plt.figure(figsize=(1, 1))
         sub_plot = fig.add_subplot(111)
 
-        draw_3d_chart(size, errors, sub_plot)
+        draw_contour_plot(size, errors, sub_plot)
 
         slider_ax = plt.axes([0.1, 0.05, 0.8, 0.05])
-        z_slider = Slider(ax=slider_ax, label="z", valmin=0.0, valmax=1.0, valinit=0.5)
+        z_slider = Slider(ax=slider_ax, label="z",
+                          valmin=0.0, valmax=1.0, valinit=0.5)
 
         def update(value):
-            draw_3d_chart(size, errors, sub_plot, z_index=int(min(value * size, size)))
+            draw_contour_plot(size, errors, sub_plot,
+                              z_index=int(min(value * size, size)))
             fig.canvas.draw_idle()
 
         z_slider.on_changed(update)
@@ -192,8 +179,10 @@ print("Sensors: ", sensor_count)
 
 data_length = len(distances)
 data_split = int(data_length * 0.8)
-learning_distances, testing_distances = distances[:data_split, :], distances[data_split:, :]
-learning_targets, testing_targets = targets[:data_split, :], targets[data_split:, :]
+learning_distances, testing_distances = \
+        distances[:data_split, :], distances[data_split:, :]
+learning_targets, testing_targets = \
+        targets[:data_split, :], targets[data_split:, :]
 
 model = build_model(dimension_count, sensor_count)
 
@@ -201,7 +190,8 @@ model = build_model(dimension_count, sensor_count)
 model.fit(learning_distances, learning_targets, epochs=1)
 
 # Test model
-test_loss, test_mae, test_mse = model.evaluate(testing_distances, testing_targets)
+test_loss, test_mae, test_mse = \
+        model.evaluate(testing_distances, testing_targets)
 print("Test MAE:", test_mae, ", Test MSE:", test_mse)
 
 # Plot prediction
