@@ -66,7 +66,10 @@ def generate_targets(number_of_targets, dimension):
 
 
 def shitty_distance(a, b):
-    return np.amax(np.abs(a - b))
+    """
+    Calculate shitty block distance. ( https://de.wikipedia.org/wiki/Manhattan-Metrik )
+    """
+    return np.sum(np.abs(a - b))
 
 
 def distance(a, b):
