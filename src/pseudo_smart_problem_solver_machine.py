@@ -19,7 +19,9 @@ def build_model(dimension_count, sensor_count):
     model = keras.Sequential([
         keras.layers.Dense(20 * sensor_count, activation=tf.nn.relu,
                            input_shape=(sensor_count,)),
+        keras.layers.Dropout(0.75),
         keras.layers.Dense(20 * sensor_count, activation=tf.nn.softmax),
+        keras.layers.Dropout(0.75),
         keras.layers.Dense(dimension_count)
     ])
 
@@ -222,14 +224,14 @@ def train_model(dimension_count, sensor_count, batch_size, steps, validation_ste
     return model, sensors
 
 
-dimension_count = 2
+dimension_count = 10
 model, sensors = train_model(
     dimension_count=dimension_count,
-    sensor_count=3,
+    sensor_count=11,
     batch_size=100,
-    steps=1000,
+    steps=100000,
     validation_steps=200,
-    epochs=5
+    epochs=10
 )
 
 # Plot prediction for 2D or 3D data
