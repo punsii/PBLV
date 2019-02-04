@@ -36,7 +36,8 @@ def build_model(dimension_count, sensor_count):
                            input_shape=(sensor_count,), kernel_initializer=keras.initializers.he_normal()),
         keras.layers.Dense(20 * sensor_count, activation=tf.nn.softmax,
                            kernel_initializer=keras.initializers.he_normal()),
-        keras.layers.Dense(dimension_count, kernel_initializer=keras.initializers.he_normal())
+        keras.layers.Dense(
+            dimension_count, kernel_initializer=keras.initializers.he_normal())
     ])
 
     model.compile(
@@ -53,12 +54,23 @@ def train_model(dimension_count, sensor_count, batch_size, steps, validation_ste
 
     sensors = generator.generate_targets(sensor_count, dimension_count)
 
+    tbCallBack = tf.keras.callbacks.TensorBoard(log_dir='../log',
+                                                histogram_freq=1,
+                                                write_graph=True,
+                                                write_grads=True,
+                                                write_images=True,
+                                                batch_size=32)
+
     model.fit_generator(
-        generator=generator.dataset_generator(sensors=sensors, dimension_count=dimension_count, batch_size=batch_size),
+        generator=generator.dataset_generator(sensors=sensors,
+                                              dimension_count=dimension_count,
+                                              batch_size=batch_size),
         steps_per_epoch=steps,
-        validation_data=generator.dataset_generator(sensors=sensors, dimension_count=dimension_count,
+        validation_data=generator.dataset_generator(sensors=sensors,
+                                                    dimension_count=dimension_count,
                                                     batch_size=batch_size),
         validation_steps=validation_steps,
+        callbacks=[tbCallBack],
         epochs=epochs
     )
 
