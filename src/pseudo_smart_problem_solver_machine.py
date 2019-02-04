@@ -33,11 +33,10 @@ def build_model(dimension_count, sensor_count):
     """
     model = keras.Sequential([
         keras.layers.Dense(20 * sensor_count, activation=tf.nn.relu,
-                           input_shape=(sensor_count,)),
-        keras.layers.Dropout(0.75),
-        keras.layers.Dense(20 * sensor_count, activation=tf.nn.softmax),
-        keras.layers.Dropout(0.75),
-        keras.layers.Dense(dimension_count)
+                           input_shape=(sensor_count,), kernel_initializer=keras.initializers.he_normal()),
+        keras.layers.Dense(20 * sensor_count, activation=tf.nn.softmax,
+                           kernel_initializer=keras.initializers.he_normal()),
+        keras.layers.Dense(dimension_count, kernel_initializer=keras.initializers.he_normal())
     ])
 
     model.compile(
@@ -57,7 +56,8 @@ def train_model(dimension_count, sensor_count, batch_size, steps, validation_ste
     model.fit_generator(
         generator=generator.dataset_generator(sensors=sensors, dimension_count=dimension_count, batch_size=batch_size),
         steps_per_epoch=steps,
-        validation_data=generator.dataset_generator(sensors=sensors, dimension_count=dimension_count, batch_size=batch_size),
+        validation_data=generator.dataset_generator(sensors=sensors, dimension_count=dimension_count,
+                                                    batch_size=batch_size),
         validation_steps=validation_steps,
         epochs=epochs
     )
@@ -98,7 +98,7 @@ def visualize_2D_3D_interactive(model, sensors, size, dimension_count):
         subplot.clear()
         cont_plot = subplot.contourf(np.linspace(0.0, 1.0, size),
                                      np.linspace(0.0, 1.0, size),
-                                     errors.transpose(), cmap=cm.PuBu_r)
+                                     errors.transpose(), cmap=cm.rainbow)
 
         example_distances = np.array([
             generator.calculate_distances(np.array(cur_pos), sensors)
@@ -174,14 +174,14 @@ def visualize_2D_3D_interactive(model, sensors, size, dimension_count):
     plt.show()
 
 
-DIMENSION_COUNT = 15
+DIMENSION_COUNT = 3
 MODEL, SENSORS = train_model(
     dimension_count=DIMENSION_COUNT,
-    sensor_count=16,
+    sensor_count=5,
     batch_size=100,
-    steps=10,
-    validation_steps=50,
-    epochs=5
+    steps=1000,
+    validation_steps=200,
+    epochs=10
 )
 
 # Plot prediction for 2D or 3D data

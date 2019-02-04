@@ -70,8 +70,7 @@ def generate_targets(number_of_targets, dimension):
     """
     generates number_of_targets targets.
     """
-    return np.random.randn(number_of_targets, dimension)
-    # return np.random.rand(number_of_targets, dimension)
+    return np.random.rand(number_of_targets, dimension)
 
 
 def shitty_distance(a, b):
