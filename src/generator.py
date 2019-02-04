@@ -4,6 +4,20 @@ Module for generating random testdata
 import numpy as np
 
 
+def dataset_generator(sensors, dimension_count, batch_size):
+    """
+    Keras data generator function.
+    :param sensors: positions of the sensors
+    :param batch_size: size of the batch
+    :return:
+    """
+    while True:
+        targets = generate_targets(batch_size, dimension_count)
+        distances = apply_sensors_on_targets(targets, sensors)
+
+        yield distances, targets
+
+
 def generate_data_matrix(size, dimension_count, sensors, range_min=0.0, range_max=1.0):
     """
     Generate a data matrix with the given [sensors] positions.
@@ -67,7 +81,8 @@ def generate_targets(number_of_targets, dimension):
 
 def shitty_distance(a, b):
     """
-    Calculate shitty block distance. ( https://de.wikipedia.org/wiki/Manhattan-Metrik )
+    Calculate shitty block distance.
+    ( https://de.wikipedia.org/wiki/Manhattan-Metrik )
     """
     return np.sum(np.abs(a - b))
 
