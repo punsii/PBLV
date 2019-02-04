@@ -31,52 +31,47 @@ def generate_data_matrix(size, dimension_count, sensors, range_min=0.0, range_ma
     :param range_max: the axis ranges maximum value
     :return: n-dimensional matrix filled with data
     """
-
     # Validate sensor dimensions
     for sensor in sensors:
         if len(sensor) != dimension_count:
             raise Exception(f"Sensor position dimension does not match passed dimension count {dimension_count}")
 
-    axis_values = np.zeros(shape=(dimension_count, size))
+    sensor_count = len(sensors)
 
-    tmp_values = np.linspace(start=range_min, stop=range_max, num=size)
-    for i in range(dimension_count):
-        axis_values[i] = tmp_values
+    axis_values = np.linspace(start=range_min, stop=range_max, num=size)
 
-    targets = []
-    distances = []
-    _generate_data_matrix_distances(
-        axis_values,
-        index=0,
-        max_index=dimension_count - 1,
-        targets=targets,
-        distances=distances,
-        sensors=sensors,
-    )
+    count = size ** dimension_count
+    counter = np.zeros(shape=dimension_count, dtype=int)
+    max_counter_index = size - 1
 
-    targets = np.array(targets)
-    distances = np.array(distances)
+    targets = np.zeros(shape=(count, dimension_count))
+    distances = np.zeros(shape=(count, len(sensors)))
+
+    for i in range(count):
+        for dimension_index in range(dimension_count):
+            targets[i, dimension_index] = axis_values[counter[dimension_index]]
+
+        for sensor_index in range(sensor_count):
+            distances[i, sensor_index] = distance(targets[i], sensors[sensor_index])
+
+        counter_index = dimension_count - 1
+        while True:
+            if counter[counter_index] < max_counter_index:
+                counter[counter_index] += 1
+                break
+            else:
+                counter[counter_index] = 0
+                counter_index -= 1
 
     return targets, distances
-
-
-def _generate_data_matrix_distances(axis_values, index, max_index, targets, distances, sensors, *values):
-    for value in axis_values[index]:
-        if index < max_index:
-            _generate_data_matrix_distances(axis_values, index + 1, max_index, targets, distances, sensors, *values,
-                                            value)
-        else:
-            target = np.array([*values, value])
-            targets.append(target)
-
-            distances.append(calculate_distances(target, sensors))
 
 
 def generate_targets(number_of_targets, dimension):
     """
     generates number_of_targets targets.
     """
-    return np.random.rand(number_of_targets, dimension)
+    return np.random.randn(number_of_targets, dimension)
+    # return np.random.rand(number_of_targets, dimension)
 
 
 def shitty_distance(a, b):
