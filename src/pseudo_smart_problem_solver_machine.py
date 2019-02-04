@@ -4,6 +4,8 @@ Module for training and evaluating position-estimating neural net
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 from matplotlib import cm
+import plotly.plotly as py
+import plotly.tools as tls
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
@@ -62,11 +64,28 @@ def train_model(dimension_count, sensor_count, batch_size, steps, validation_ste
 
     return model, sensors
 
-def visualize_error_per_dimension(model, sensors, dimension_count):
-    print("test")
+
+def visualize_error_per_dimension(model, sensors, size, dimension_count):
+    """
+    Plot average error for each dimension
+    """
+    targets, distances = \
+        generator.generate_data_matrix(size, dimension_count, sensors)
+
+    predictions = model.predict(distances)
+    errors = np.zeros((predictions.shape[0], dimension_count))
+    for i, _ in enumerate(predictions):
+        for dim in range(dimension_count):
+            errors[i, dim] = predictions[i][dim] - targets[i][dim]
+
+    plt.bar(range(dimension_count), errors[0], width=0.5, color="blue")
+    plt.xlabel("dimension")
+    plt.ylabel("absolute error")
+    plt.title("error per dimension")
+    plt.show()
 
 
-def visualize_error_interactive(model, sensors, size, dimension_count):
+def visualize_2D_3D_interactive(model, sensors, size, dimension_count):
     """
     Draw a 2D-heatmap of prediction errors for a (size x size) grid.
     """
@@ -155,18 +174,18 @@ def visualize_error_interactive(model, sensors, size, dimension_count):
     plt.show()
 
 
-DIMENSION_COUNT = 10
+DIMENSION_COUNT = 15
 MODEL, SENSORS = train_model(
     dimension_count=DIMENSION_COUNT,
-    sensor_count=200,
+    sensor_count=16,
     batch_size=100,
-    steps=100,
+    steps=10,
     validation_steps=50,
     epochs=5
 )
 
 # Plot prediction for 2D or 3D data
 if 2 <= DIMENSION_COUNT <= 3:
-    visualize_error_interactive(MODEL, SENSORS, 60, DIMENSION_COUNT)
+    visualize_2D_3D_interactive(MODEL, SENSORS, 60, DIMENSION_COUNT)
 else:
-    visualize_error_per_dimension(MODEL, SENSORS, DIMENSION_COUNT)
+    visualize_error_per_dimension(MODEL, SENSORS, 2, DIMENSION_COUNT)
