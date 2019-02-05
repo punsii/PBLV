@@ -61,7 +61,7 @@ if args.visualize_errors:
             MODEL, SENSORS, args.error_visualization_accuracy, args.dimension_count)
     else:
         visualize_error_per_dimension(
-            MODEL, SENSORS, args.error_visualization_accuracy, args.dimension_count)
+            MODEL, SENSORS, args.dimension_count)
     print("===================== DONE =====================\n\n")
 
 print("=========== Model runner terminated ============")

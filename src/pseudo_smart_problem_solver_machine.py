@@ -77,25 +77,36 @@ def train_model(dimension_count, sensor_count, batch_size, steps, validation_ste
     return model, sensors
 
 
-def visualize_error_per_dimension(model, sensors, size, dimension_count):
+def visualize_error_per_dimension(model, sensors, dimension_count):
     """
     Plot average error for each dimension
     """
-    targets, distances = \
-        generator.generate_data_matrix(size, dimension_count, sensors)
+    def draw(example_generator):
+        plt.clf()
+        distances, targets = next(example_generator)
+        predictions = model.predict(distances)
+        error = np.absolute(targets[0] - predictions[0])
+        plt.bar(np.arange(dimension_count)-0.2, targets[0],
+                width=0.2, color='green', label='target')
+        plt.bar(np.arange(dimension_count), predictions[0],
+                width=0.2, color='blue', label='prediction')
+        plt.bar(np.arange(dimension_count)+0.2, error,
+                width=0.2, color='red', label='error')
+        plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.05),
+                   ncol=3, fancybox=True, shadow=True)
+        plt.draw()
 
-    predictions = model.predict(distances)
-    errors = np.zeros((predictions.shape[0], dimension_count))
-    for i, _ in enumerate(predictions):
-        for dim in range(dimension_count):
-            errors[i, dim] = predictions[i][dim] - targets[i][dim]
+    example_generator = generator.dataset_generator(sensors, dimension_count, 1)
 
-    plt.bar(range(dimension_count), errors[0], width=0.5, color="blue")
+    fig, _ = plt.subplots()
     plt.xlabel("dimension")
     plt.ylabel("absolute error")
     plt.title("error per dimension")
-    plt.show()
+    fig.canvas.mpl_connect('button_press_event',
+                           lambda event: draw(example_generator))
 
+    draw(example_generator)
+    plt.show()
 
 def visualize_2D_3D_interactive(model, sensors, size, dimension_count):
     """
@@ -136,8 +147,7 @@ def visualize_2D_3D_interactive(model, sensors, size, dimension_count):
     predictions = model.predict(distances)
     errors = np.zeros(predictions.shape[0])
     for i, _ in enumerate(predictions):
-        errors[i] = np.linalg.norm(
-            predictions[i] - targets[i])
+        errors[i] = generator.distance(predictions[i], targets[i])
 
     if dimension_count == 2:
         errors = np.reshape(errors, (size, size))
@@ -176,11 +186,11 @@ def visualize_2D_3D_interactive(model, sensors, size, dimension_count):
         z_slider = Slider(ax=slider_ax, label="z",
                           valmin=0.0, valmax=1.0, valinit=0)
 
-        def update(subplot, cur_pos, value):
+        def slider_update(subplot, cur_pos, value):
             cur_pos[2] = value
 
             draw_plot(subplot, size, errors, cur_pos)
 
-        z_slider.on_changed(lambda z_val: update(subplot, cur_pos, z_val))
+        z_slider.on_changed(lambda z_val: slider_update(subplot, cur_pos, z_val))
 
     plt.show()
