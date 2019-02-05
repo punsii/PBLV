@@ -12,20 +12,27 @@ def load_configuration(configuration_file_path, args):
 
         configuration_dictionary = json.loads(content)
 
-        args.visualize_errors = configuration_dictionary["visualize_errors"]
-        args.error_visualization_accuracy = configuration_dictionary["error_visualization_accuracy"]
-        args.dimension_count = configuration_dictionary["dimension_count"]
-        args.sensor_count = configuration_dictionary["sensor_count"]
-        args.epochs = configuration_dictionary["epochs"]
-        args.steps = configuration_dictionary["steps"]
-        args.validation_steps = configuration_dictionary["validation_steps"]
-        args.batch_size = configuration_dictionary["batch_size"]
+        if "visualize_errors" in configuration_dictionary:
+            args.visualize_errors = configuration_dictionary["visualize_errors"]
+        if "error_visualization_accuracy" in configuration_dictionary:
+            args.error_visualization_accuracy = configuration_dictionary["error_visualization_accuracy"]
+        if "dimension_count" in configuration_dictionary:
+            args.dimension_count = configuration_dictionary["dimension_count"]
+        if "sensor_count" in configuration_dictionary:
+            args.sensor_count = configuration_dictionary["sensor_count"]
+        if "epochs" in configuration_dictionary:
+            args.epochs = configuration_dictionary["epochs"]
+        if "steps" in configuration_dictionary:
+            args.steps = configuration_dictionary["steps"]
+        if "validation_steps" in configuration_dictionary:
+            args.validation_steps = configuration_dictionary["validation_steps"]
+        if "batch_size" in configuration_dictionary:
+            args.batch_size = configuration_dictionary["batch_size"]
 
 
-def store_configuration(configuration_file_path, args):
+def store_configuration(configuration_file_path, args, omit_visualize_errors=False):
     with open(configuration_file_path, "w+") as file:
         configuration_dictionary = {
-            "visualize_errors": args.visualize_errors,
             "error_visualization_accuracy": args.error_visualization_accuracy,
             "dimension_count": args.dimension_count,
             "sensor_count": args.sensor_count,
@@ -34,6 +41,9 @@ def store_configuration(configuration_file_path, args):
             "validation_steps": args.validation_steps,
             "batch_size": args.batch_size,
         }
+
+        if not omit_visualize_errors:
+            configuration_dictionary["visualize_errors"] = args.visualize_errors
 
         file.write(json.dumps(configuration_dictionary, indent=4))
 
@@ -140,7 +150,7 @@ if args.save_model:
         np.savetxt(file, SENSORS)
 
     # Store configuration
-    store_configuration(f"{args.model_path}/configuration", args)
+    store_configuration(f"{args.model_path}/configuration", args, omit_visualize_errors=True)
 
     print("===================== DONE =====================\n")
 
