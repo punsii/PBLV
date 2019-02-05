@@ -14,8 +14,10 @@ parser.add_argument("--dimension_count", dest="dimension_count", type=int, defau
                     help="How many dimensions the model should be configured and trained with")
 parser.add_argument("--sensor_count", dest="sensor_count", type=int, default=4,
                     help="How many sensors should be placed randomly in the \"room\"")
-parser.add_argument("--epochs", dest="epochs", type=int, default=10, help="How many epochs to train the model")
-parser.add_argument("--steps", dest="steps", type=int, default=1000, help="Steps to train the model")
+parser.add_argument("--epochs", dest="epochs", type=int,
+                    default=10, help="How many epochs to train the model")
+parser.add_argument("--steps", dest="steps", type=int,
+                    default=1000, help="Steps to train the model")
 parser.add_argument("--validation_steps", dest="validation_steps", default=200, type=int,
                     help="Steps to validate the model after training with")
 parser.add_argument("--batch_size", dest="batch_size", type=int, default=100,
@@ -55,9 +57,11 @@ if args.save_model:
 if args.visualize_errors:
     print("========= Visualizing the model errors =========")
     if 2 <= args.dimension_count <= 3:
-        visualize_2D_3D_interactive(MODEL, SENSORS, args.error_visualization_accuracy, args.dimension_count)
+        visualize_2D_3D_interactive(
+            MODEL, SENSORS, args.error_visualization_accuracy, args.dimension_count)
     else:
-        visualize_error_per_dimension(MODEL, SENSORS, args.error_visualization_accuracy, args.dimension_count)
+        visualize_error_per_dimension(
+            MODEL, SENSORS, args.error_visualization_accuracy, args.dimension_count)
     print("===================== DONE =====================\n\n")
 
 print("=========== Model runner terminated ============")
