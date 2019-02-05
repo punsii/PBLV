@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 from pseudo_smart_problem_solver_machine import train_model, visualize_2D_3D_interactive, visualize_error_per_dimension
+import tensorflow as tf
 
 parser = ArgumentParser()
 parser.add_argument("-s", "--save", dest="save_model", action="store_true",
@@ -51,7 +52,12 @@ print("===================== DONE =====================\n\n")
 
 if args.save_model:
     print("=========== Storing the trained model ==========")
-
+    tf.keras.models.save_model(
+        MODEL,
+        args.save_destination,
+        overwrite=True,
+        include_optimizer=True
+    )
     print("===================== DONE =====================\n\n")
 
 if args.visualize_errors:
