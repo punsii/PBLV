@@ -1,6 +1,4 @@
-*.model
-*.model.sensors
-*.model.configuration
+model_output/
 
 .idea/
 log/*

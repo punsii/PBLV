@@ -1,14 +1,51 @@
+import os
 from argparse import ArgumentParser
 from pseudo_smart_problem_solver_machine import train_model, visualize_2D_3D_interactive, visualize_error_per_dimension
 import tensorflow as tf
 import numpy as np
+import json
+
+
+def load_configuration(configuration_file_path, args):
+    with open(configuration_file_path, "r") as file:
+        content = file.read()
+
+        configuration_dictionary = json.loads(content)
+
+        args.visualize_errors = configuration_dictionary["visualize_errors"]
+        args.error_visualization_accuracy = configuration_dictionary["error_visualization_accuracy"]
+        args.dimension_count = configuration_dictionary["dimension_count"]
+        args.sensor_count = configuration_dictionary["sensor_count"]
+        args.epochs = configuration_dictionary["epochs"]
+        args.steps = configuration_dictionary["steps"]
+        args.validation_steps = configuration_dictionary["validation_steps"]
+        args.batch_size = configuration_dictionary["batch_size"]
+
+
+def store_configuration(configuration_file_path, args):
+    with open(configuration_file_path, "w+") as file:
+        configuration_dictionary = {
+            "visualize_errors": args.visualize_errors,
+            "error_visualization_accuracy": args.error_visualization_accuracy,
+            "dimension_count": args.dimension_count,
+            "sensor_count": args.sensor_count,
+            "epochs": args.epochs,
+            "steps": args.steps,
+            "validation_steps": args.validation_steps,
+            "batch_size": args.batch_size,
+        }
+
+        file.write(json.dumps(configuration_dictionary, indent=4))
+
 
 parser = ArgumentParser()
+parser.add_argument("-c", "--config", dest="configuration",
+                    help="Path to a configuration file to use")
 parser.add_argument("-s", "--save", dest="save_model", action="store_true",
-                    help="Whether the model should be saved to file defined in --model_path")
+                    help="Whether the model should be saved to folder defined in --model_path")
 parser.add_argument("-l", "--load", dest="load_model", action="store_true",
                     help="Whether the model defined in --model_path should be loaded")
-parser.add_argument("-f", "--model_path", dest="model_path", default="last.model",
+parser.add_argument("-f", "--model_path", dest="model_path", default="model_output/default",
                     help="A model file on disk to load from or save to")
 parser.add_argument("-v", "--visualize_errors", dest="visualize_errors", action="store_true",
                     help="Visualize the resulting models errors")
@@ -29,10 +66,41 @@ parser.add_argument("--batch_size", dest="batch_size", type=int, default=100,
 
 args = parser.parse_args()
 
+if args.configuration:
+    load_configuration(args.configuration, args)
+
+MODEL = None
+SENSORS = None
+
 print("===== Running model runner with arguments: =====")
-print("Save model?", args.save_model)
-print("Load model?", args.load_model)
-print("Save/Load model from/to", f"\"{args.model_path}\"")
+if args.save_model or args.load_model:
+    saved_loaded_expr = ""
+    if args.save_model:
+        saved_loaded_expr = "saved to"
+    else:
+        saved_loaded_expr = "loaded from"
+    print("Model will be", saved_loaded_expr, f"\"{args.model_path}\"")
+print("================================================\n")
+
+if args.load_model:
+    print("========= Loading the model from file ==========")
+    MODEL = tf.keras.models.load_model(
+        f"{args.model_path}/model",
+        custom_objects=None,
+        compile=True
+    )
+
+    # Load sensors
+    SENSORS = np.loadtxt(f"{args.model_path}/sensors")
+
+    # Load configuration
+    if not args.configuration:
+        # Only load configuration if --config is not specified
+        load_configuration(f"{args.model_path}/configuration", args)
+    print("===================== DONE =====================\n")
+
+# Print final configuration
+print("================ Configuration =================")
 print("Visualize errors:", args.visualize_errors)
 print("Error visualization accuracy:", args.error_visualization_accuracy)
 print("Dimension count:", args.dimension_count)
@@ -41,24 +109,10 @@ print("Epochs:", args.epochs)
 print("Steps:", args.steps)
 print("Validation Steps:", args.validation_steps)
 print("Batch size:", args.batch_size)
-print("================================================\n\n")
+print("================================================\n")
 
-MODEL = None
-SENSORS = None
-
-if args.load_model:
-    print("========= Loading the model from file ==========")
-    MODEL = tf.keras.models.load_model(
-        args.model_path,
-        custom_objects=None,
-        compile=True
-    )
-
-    # Load sensors
-    SENSORS = np.loadtxt(f"{args.model_path}.sensors")
-    print("===================== DONE =====================\n\n")
-else:
-    print("==== Configuring/Training the model for you ====")
+if not args.load_model:
+    print("======== Training the model for you <3 =========")
     MODEL, SENSORS = train_model(
         dimension_count=args.dimension_count,
         sensor_count=args.sensor_count,
@@ -67,21 +121,28 @@ else:
         validation_steps=args.validation_steps,
         epochs=args.epochs
     )
-    print("===================== DONE =====================\n\n")
+    print("===================== DONE =====================\n")
 
 if args.save_model:
     print("=========== Storing the trained model ==========")
+    if not os.path.exists(args.model_path):
+        os.makedirs(args.model_path)
+
     tf.keras.models.save_model(
         MODEL,
-        args.model_path,
+        f"{args.model_path}/model",
         overwrite=True,
         include_optimizer=True
     )
 
     # Store sensors
-    with open(f"{args.model_path}.sensors", "w+") as file:
+    with open(f"{args.model_path}/sensors", "w+") as file:
         np.savetxt(file, SENSORS)
-    print("===================== DONE =====================\n\n")
+
+    # Store configuration
+    store_configuration(f"{args.model_path}/configuration", args)
+
+    print("===================== DONE =====================\n")
 
 if args.visualize_errors:
     print("========= Visualizing the model errors =========")
@@ -91,6 +152,6 @@ if args.visualize_errors:
     else:
         visualize_error_per_dimension(
             MODEL, SENSORS, args.error_visualization_accuracy, args.dimension_count)
-    print("===================== DONE =====================\n\n")
+    print("===================== DONE =====================\n")
 
 print("=========== Model runner terminated ============")
