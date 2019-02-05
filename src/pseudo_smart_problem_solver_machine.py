@@ -49,7 +49,7 @@ def build_model(dimension_count, sensor_count):
     return model
 
 
-def train_model(dimension_count, sensor_count, batch_size, steps, validation_steps, epochs):
+def train_model(dimension_count, sensor_count, batch_size, steps, validation_steps, epochs, city_block=False):
     model = build_model(dimension_count, sensor_count)
 
     sensors = generator.generate_targets(sensor_count, dimension_count)
@@ -64,11 +64,13 @@ def train_model(dimension_count, sensor_count, batch_size, steps, validation_ste
     model.fit_generator(
         generator=generator.dataset_generator(sensors=sensors,
                                               dimension_count=dimension_count,
-                                              batch_size=batch_size),
+                                              batch_size=batch_size,
+                                              cityblock=city_block),
         steps_per_epoch=steps,
         validation_data=generator.dataset_generator(sensors=sensors,
                                                     dimension_count=dimension_count,
-                                                    batch_size=batch_size),
+                                                    batch_size=batch_size,
+                                                    cityblock=city_block),
         validation_steps=validation_steps,
         callbacks=[tbCallBack],
         epochs=epochs

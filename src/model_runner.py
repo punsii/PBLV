@@ -15,6 +15,7 @@ print("""
                                             
 """)
 
+
 def load_configuration(configuration_file_path, args):
     with open(configuration_file_path, "r") as file:
         content = file.read()
@@ -37,6 +38,8 @@ def load_configuration(configuration_file_path, args):
             args.validation_steps = configuration_dictionary["validation_steps"]
         if "batch_size" in configuration_dictionary:
             args.batch_size = configuration_dictionary["batch_size"]
+        if "city_block" in configuration_dictionary:
+            args.city_block = configuration_dictionary["city_block"]
 
 
 def store_configuration(configuration_file_path, args, omit_visualize_errors=False):
@@ -49,6 +52,7 @@ def store_configuration(configuration_file_path, args, omit_visualize_errors=Fal
             "steps": args.steps,
             "validation_steps": args.validation_steps,
             "batch_size": args.batch_size,
+            "city_block": args.city_block,
         }
 
         if not omit_visualize_errors:
@@ -82,6 +86,8 @@ parser.add_argument("--validation_steps", dest="validation_steps", default=200, 
                     help="Steps to validate the model after training with")
 parser.add_argument("--batch_size", dest="batch_size", type=int, default=100,
                     help="Batch size of single steps to train the model with")
+parser.add_argument("--city_block", dest="city_block", action="store_true",
+                    help="Whether to use cityblock metrics instead of the euclidean distance")
 
 args = parser.parse_args()
 
@@ -128,6 +134,7 @@ print("Epochs:", args.epochs)
 print("Steps:", args.steps)
 print("Validation Steps:", args.validation_steps)
 print("Batch size:", args.batch_size)
+print("City block metrics?", args.city_block)
 print("================================================\n")
 
 if not args.load_model:
@@ -138,7 +145,8 @@ if not args.load_model:
         batch_size=args.batch_size,
         steps=args.steps,
         validation_steps=args.validation_steps,
-        epochs=args.epochs
+        epochs=args.epochs,
+        city_block=args.city_block,
     )
     print("===================== DONE =====================\n")
 
