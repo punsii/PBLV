@@ -4,7 +4,7 @@ Module for generating random testdata
 import numpy as np
 
 
-def dataset_generator(sensors, dimension_count, batch_size):
+def dataset_generator(sensors, dimension_count, batch_size, cityblock=False):
     """
     Keras data generator function.
     :param sensors: positions of the sensors
@@ -13,12 +13,12 @@ def dataset_generator(sensors, dimension_count, batch_size):
     """
     while True:
         targets = generate_targets(batch_size, dimension_count)
-        distances = apply_sensors_on_targets(targets, sensors)
+        distances = apply_sensors_on_targets(targets, sensors, cityblock)
 
         yield distances, targets
 
 
-def generate_data_matrix(size, dimension_count, sensors, range_min=0.0, range_max=1.0):
+def generate_data_matrix(size, dimension_count, sensors, range_min=0.0, range_max=1.0, cityblock=False):
     """
     Generate a data matrix with the given [sensors] positions.
     Set the resulting data size by setting [size] and [dimension_count].
@@ -29,6 +29,7 @@ def generate_data_matrix(size, dimension_count, sensors, range_min=0.0, range_ma
     :param sensors: positions of the sensors
     :param range_min: the axis ranges minimum value
     :param range_max: the axis ranges maximum value
+    :param cityblock: whether to use cityblock metrics
     :return: n-dimensional matrix filled with data
     """
     # Validate sensor dimensions
@@ -52,7 +53,7 @@ def generate_data_matrix(size, dimension_count, sensors, range_min=0.0, range_ma
             targets[i, dimension_index] = axis_values[counter[dimension_index]]
 
         for sensor_index in range(sensor_count):
-            distances[i, sensor_index] = distance(targets[i], sensors[sensor_index])
+            distances[i, sensor_index] = distance(targets[i], sensors[sensor_index], cityblock)
 
         counter_index = dimension_count - 1
         while True:
@@ -73,41 +74,25 @@ def generate_targets(number_of_targets, dimension):
     return np.random.rand(number_of_targets, dimension)
 
 
-def shitty_distance(a, b):
-    """
-    Calculate shitty block distance.
-    ( https://de.wikipedia.org/wiki/Manhattan-Metrik )
-    """
-    return np.sum(np.abs(a - b))
-
-
-def distance(a, b):
+def distance(a, b, cityblock=False):
     """
     returns distance between two numpy-arrays.
     """
-    return np.linalg.norm(a - b)
+    return np.linalg.norm(a - b) if not cityblock else np.sum(np.abs(a - b))
 
 
-def calculate_shitty_distances(target, sensors):
-    return np.apply_along_axis(lambda sensor: shitty_distance(target, sensor), 1, sensors)
-
-
-def calculate_distances(target, sensors):
+def calculate_distances(target, sensors, cityblock=False):
     """
     calculate distances for a list sensors.
     """
-    return np.apply_along_axis(lambda sensor: distance(target, sensor), 1, sensors)
+    return np.apply_along_axis(lambda sensor: distance(target, sensor, cityblock), 1, sensors)
 
 
-def apply_sensors_on_targets(targets, sensors):
+def apply_sensors_on_targets(targets, sensors, cityblock=False):
     """
     calculate distances matrix between targets and sensors.
     """
-    return np.apply_along_axis(lambda target: calculate_distances(target, sensors), 1, targets)
-
-
-def shitty_apply_sensors_on_targets(targets, sensors):
-    return np.apply_along_axis(lambda target: calculate_shitty_distances(target, sensors), 1, targets)
+    return np.apply_along_axis(lambda target: calculate_distances(target, sensors, cityblock), 1, targets)
 
 
 def test():
