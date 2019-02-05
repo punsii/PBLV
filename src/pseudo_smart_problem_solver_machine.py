@@ -184,20 +184,3 @@ def visualize_2D_3D_interactive(model, sensors, size, dimension_count):
         z_slider.on_changed(lambda z_val: update(subplot, cur_pos, z_val))
 
     plt.show()
-
-
-DIMENSION_COUNT = 3
-MODEL, SENSORS = train_model(
-    dimension_count=DIMENSION_COUNT,
-    sensor_count=5,
-    batch_size=100,
-    steps=1000,
-    validation_steps=200,
-    epochs=10
-)
-
-# Plot prediction for 2D or 3D data
-if 2 <= DIMENSION_COUNT <= 3:
-    visualize_2D_3D_interactive(MODEL, SENSORS, 60, DIMENSION_COUNT)
-else:
-    visualize_error_per_dimension(MODEL, SENSORS, 2, DIMENSION_COUNT)
