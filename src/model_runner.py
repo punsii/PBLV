@@ -5,6 +5,15 @@ import tensorflow as tf
 import numpy as np
 import json
 
+print("""
+   _____                                     
+  / ____|                                    
+ | (___     ___   _ __  __   __  _   _   ___ 
+  \___ \   / _ \ | '__| \ \ / / | | | | / __|
+  ____) | |  __/ | |     \ V /  | |_| | \__ \\
+ |_____/   \___| |_|      \_/    \__,_| |___/
+                                            
+""")
 
 def load_configuration(configuration_file_path, args):
     with open(configuration_file_path, "r") as file:
