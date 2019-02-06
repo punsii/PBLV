@@ -32,7 +32,7 @@ def build_model(dimension_count, sensor_count):
     Configure and compile tensorFlow model.
     """
     model = keras.Sequential([
-        keras.layers.Dense(16 * dimension_count, activation=tf.nn.elu,
+        keras.layers.Dense(16 * int(np.math.sqrt(dimension_count * sensor_count)), activation=tf.nn.elu,
                            input_shape=(sensor_count,)),
         keras.layers.Dense(8 * dimension_count, activation=tf.nn.elu),
         keras.layers.Dense(4 * dimension_count, activation=tf.nn.elu),
@@ -83,16 +83,17 @@ def visualize_error_per_dimension(model, sensors, dimension_count):
     """
     Plot average error for each dimension
     """
+
     def draw(example_generator):
         plt.clf()
         distances, targets = next(example_generator)
         predictions = model.predict(distances)
         error = np.absolute(targets[0] - predictions[0])
-        plt.bar(np.arange(dimension_count)-0.2, targets[0],
+        plt.bar(np.arange(dimension_count) - 0.2, targets[0],
                 width=0.2, color='green', label='target')
         plt.bar(np.arange(dimension_count), predictions[0],
                 width=0.2, color='blue', label='prediction')
-        plt.bar(np.arange(dimension_count)+0.2, error,
+        plt.bar(np.arange(dimension_count) + 0.2, error,
                 width=0.2, color='red', label='error')
         plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.05),
                    ncol=3, fancybox=True, shadow=True)
@@ -109,6 +110,7 @@ def visualize_error_per_dimension(model, sensors, dimension_count):
 
     draw(example_generator)
     plt.show()
+
 
 def visualize_2D_3D_interactive(model, sensors, size, dimension_count):
     """
