@@ -32,12 +32,12 @@ def build_model(dimension_count, sensor_count):
     Configure and compile tensorFlow model.
     """
     model = keras.Sequential([
-        keras.layers.Dense(20 * sensor_count, activation=tf.nn.relu,
-                           input_shape=(sensor_count,), kernel_initializer=keras.initializers.he_normal()),
-        keras.layers.Dense(20 * sensor_count, activation=tf.nn.softmax,
-                           kernel_initializer=keras.initializers.he_normal()),
-        keras.layers.Dense(
-            dimension_count, kernel_initializer=keras.initializers.he_normal())
+        keras.layers.Dense(16 * int(np.math.sqrt(dimension_count * sensor_count)), activation=tf.nn.elu,
+                           input_shape=(sensor_count,)),
+        keras.layers.Dense(8 * dimension_count, activation=tf.nn.elu),
+        keras.layers.Dense(4 * dimension_count, activation=tf.nn.elu),
+        keras.layers.Dense(2 * dimension_count, activation=tf.nn.elu),
+        keras.layers.Dense(dimension_count, activation=tf.nn.relu)
     ])
 
     model.compile(
@@ -49,7 +49,7 @@ def build_model(dimension_count, sensor_count):
     return model
 
 
-def train_model(dimension_count, sensor_count, batch_size, steps, validation_steps, epochs):
+def train_model(dimension_count, sensor_count, batch_size, steps, validation_steps, epochs, city_block=False):
     model = build_model(dimension_count, sensor_count)
 
     sensors = generator.generate_targets(sensor_count, dimension_count)
@@ -64,11 +64,13 @@ def train_model(dimension_count, sensor_count, batch_size, steps, validation_ste
     model.fit_generator(
         generator=generator.dataset_generator(sensors=sensors,
                                               dimension_count=dimension_count,
-                                              batch_size=batch_size),
+                                              batch_size=batch_size,
+                                              cityblock=city_block),
         steps_per_epoch=steps,
         validation_data=generator.dataset_generator(sensors=sensors,
                                                     dimension_count=dimension_count,
-                                                    batch_size=batch_size),
+                                                    batch_size=batch_size,
+                                                    cityblock=city_block),
         validation_steps=validation_steps,
         callbacks=[tbCallBack],
         epochs=epochs
@@ -81,16 +83,17 @@ def visualize_error_per_dimension(model, sensors, dimension_count):
     """
     Plot average error for each dimension
     """
+
     def draw(example_generator):
         plt.clf()
         distances, targets = next(example_generator)
         predictions = model.predict(distances)
         error = np.absolute(targets[0] - predictions[0])
-        plt.bar(np.arange(dimension_count)-0.2, targets[0],
+        plt.bar(np.arange(dimension_count) - 0.2, targets[0],
                 width=0.2, color='green', label='target')
         plt.bar(np.arange(dimension_count), predictions[0],
                 width=0.2, color='blue', label='prediction')
-        plt.bar(np.arange(dimension_count)+0.2, error,
+        plt.bar(np.arange(dimension_count) + 0.2, error,
                 width=0.2, color='red', label='error')
         plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.05),
                    ncol=3, fancybox=True, shadow=True)
@@ -107,6 +110,7 @@ def visualize_error_per_dimension(model, sensors, dimension_count):
 
     draw(example_generator)
     plt.show()
+
 
 def visualize_2D_3D_interactive(model, sensors, size, dimension_count):
     """

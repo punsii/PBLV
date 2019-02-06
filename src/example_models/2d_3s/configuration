@@ -1,0 +1,9 @@
+{
+    "error_visualization_accuracy": 50,
+    "dimension_count": 2,
+    "sensor_count": 3,
+    "epochs": 10,
+    "steps": 1000,
+    "validation_steps": 100,
+    "batch_size": 100
+}
