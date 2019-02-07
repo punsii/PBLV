@@ -32,8 +32,7 @@ def build_model(dimension_count, sensor_count):
     Configure and compile tensorFlow model.
     """
     model = keras.Sequential([
-        keras.layers.Dense(16 * int(np.math.sqrt(dimension_count * sensor_count)), activation=tf.nn.elu,
-                           input_shape=(sensor_count,)),
+        keras.layers.Dense(16 * int(np.math.sqrt(dimension_count * sensor_count)), activation=tf.nn.elu, input_shape=(sensor_count,)),
         keras.layers.Dense(8 * dimension_count, activation=tf.nn.elu),
         keras.layers.Dense(4 * dimension_count, activation=tf.nn.elu),
         keras.layers.Dense(2 * dimension_count, activation=tf.nn.elu),

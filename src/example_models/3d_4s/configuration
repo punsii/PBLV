@@ -1,0 +1,10 @@
+{
+    "error_visualization_accuracy": 50,
+    "dimension_count": 3,
+    "sensor_count": 4,
+    "epochs": 10,
+    "steps": 5000,
+    "validation_steps": 200,
+    "batch_size": 25,
+    "city_block": false
+}
